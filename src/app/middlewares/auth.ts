@@ -1,12 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-undef */
 /* eslint-disable no-console */
-import catchAsync from '../../utils/catchAsync';
 import config from '../config';
 import AppError from '../errors/AppError';
-import { IUserRoles } from '../modules/user/user.interface';
-import User from '../modules/user/user.model';
 import jwt, { JwtPayload } from 'jsonwebtoken';
-const auth = (...requiredRoles: IUserRoles[]) => {
+import catchAsync from '../utils/catchAsync';
+import { TUserRole } from '../modules/user/user.constant';
+import { User } from '../modules/user/user.model';
+const auth = (...requiredRoles: TUserRole[]) => {
   return catchAsync(async (req, res, next) => {
     const token = req.headers.authorization;
 
@@ -18,7 +19,7 @@ const auth = (...requiredRoles: IUserRoles[]) => {
     try {
       decoded = jwt.verify(
         token,
-        config.jwt_access_secret as string
+        config.jwt_access_secret as string,
       ) as JwtPayload;
     } catch (err: any) {
       console.log(err);
@@ -26,14 +27,14 @@ const auth = (...requiredRoles: IUserRoles[]) => {
       throw new AppError(401, 'Token is invalid!');
     }
 
-    const { role, email } = decoded as JwtPayload;
+    const { role, id } = decoded as JwtPayload;
     //CHECK IF THE USER IS EXISTS
-    const user = await User.isUserExistsByEmail(email);
+    const user = await User.isUserExistsById(id);
 
     if (!user) throw new AppError(404, 'This user does not exists!');
 
     //CHECK IF THE USER IS BLOCKED
-    if (user && user.isBlocked)
+    if (user && user.status === 'blocked')
       throw new AppError(403, 'You are not authorized!');
 
     //CHECK IF THE USER IS DELETED
