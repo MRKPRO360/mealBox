@@ -37,9 +37,7 @@ const createRecipeSchema = z.object({
     tags: z
       .array(z.string())
       .min(1, { message: 'At least one tag is required' }),
-    allergens: z
-      .array(z.string())
-      .min(1, { message: 'At least one allergen is required' }),
+    allergens: z.array(z.string()).default([]),
     totalTime: z.string().min(1, { message: 'Total time is required' }),
     prepTime: z.string().min(1, { message: 'Prep time is required' }),
     difficulty: z.string().min(1, { message: 'Difficulty is required' }),

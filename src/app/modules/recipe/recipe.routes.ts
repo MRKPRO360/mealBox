@@ -13,8 +13,6 @@ router.route('/').post(
   multerUpload.single('file'),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = JSON.parse(req.body.data);
-    console.log(req.body);
-
     next();
   },
   validateRequest(RecipeValidationSchema.createRecipeSchema),

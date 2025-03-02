@@ -35,6 +35,7 @@ const instructionSchema = new Schema<IInstruction>({
 const recipeSchema = new Schema<IRecipe>(
   {
     recipeName: { type: String, required: true },
+    recipeImage: { type: String, required: true },
     recipeMenuName: { type: String, required: true },
     description: { type: String, required: true },
     tags: { type: [String], required: true },
