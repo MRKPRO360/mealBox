@@ -28,28 +28,32 @@ const instructionSchema = z.object({
 
 // Define the Recipe schema
 const createRecipeSchema = z.object({
-  recipeName: z.string().min(1, { message: 'Recipe name is required' }),
-  recipeMenuName: z
-    .string()
-    .min(1, { message: 'Recipe menu name is required' }),
-  description: z.string().min(1, { message: 'Description is required' }),
-  tags: z.array(z.string()).min(1, { message: 'At least one tag is required' }),
-  allergens: z
-    .array(z.string())
-    .min(1, { message: 'At least one allergen is required' }),
-  totalTime: z.string().min(1, { message: 'Total time is required' }),
-  prepTime: z.string().min(1, { message: 'Prep time is required' }),
-  difficulty: z.string().min(1, { message: 'Difficulty is required' }),
-  ingredients: z
-    .array(ingredientSchema)
-    .min(1, { message: 'At least one ingredient is required' }),
-  nutritionValues: nutritionValuesSchema,
-  utensils: z
-    .array(z.string())
-    .min(1, { message: 'At least one utensil is required' }),
-  instructions: z
-    .array(instructionSchema)
-    .min(1, { message: 'At least one instruction is required' }),
+  body: z.object({
+    recipeName: z.string().min(1, { message: 'Recipe name is required' }),
+    recipeMenuName: z
+      .string()
+      .min(1, { message: 'Recipe menu name is required' }),
+    description: z.string().min(1, { message: 'Description is required' }),
+    tags: z
+      .array(z.string())
+      .min(1, { message: 'At least one tag is required' }),
+    allergens: z
+      .array(z.string())
+      .min(1, { message: 'At least one allergen is required' }),
+    totalTime: z.string().min(1, { message: 'Total time is required' }),
+    prepTime: z.string().min(1, { message: 'Prep time is required' }),
+    difficulty: z.string().min(1, { message: 'Difficulty is required' }),
+    ingredients: z
+      .array(ingredientSchema)
+      .min(1, { message: 'At least one ingredient is required' }),
+    nutritionValues: nutritionValuesSchema,
+    utensils: z
+      .array(z.string())
+      .min(1, { message: 'At least one utensil is required' }),
+    instructions: z
+      .array(instructionSchema)
+      .min(1, { message: 'At least one instruction is required' }),
+  }),
 });
 
 // Export the schemas

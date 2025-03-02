@@ -8,7 +8,7 @@ const createRecipe = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: 201,
     success: true,
-    message: 'Customer created successfully',
+    message: 'Recipe created successfully',
     data: result,
   });
 });

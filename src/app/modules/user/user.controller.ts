@@ -37,7 +37,7 @@ const createProvider = catchAsync(async (req, res) => {
 const createAdmin = catchAsync(async (req, res) => {
   const { password, ...customerData } = req.body;
 
-  const result = await UserServices.createCustomerInDB(
+  const result = await UserServices.createAdminInDB(
     req.file,
     password,
     customerData,
