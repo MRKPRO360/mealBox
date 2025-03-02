@@ -17,7 +17,7 @@ const ingredientSchema = new Schema<IIngredient>({
 const nutritionValuesSchema = new Schema<INutritionValues>({
   calories: { type: String, required: true },
   fat: { type: String, required: true },
-  saturated_fat: { type: String, required: true },
+  saturatedFat: { type: String, required: true },
   carbohydrate: { type: String, required: true },
   sugar: { type: String, required: true },
   dietaryFiber: { type: String, required: true },
@@ -55,4 +55,4 @@ const recipeSchema = new Schema<IRecipe>(
 // Create the Recipe model
 const Recipe = model<IRecipe>('Recipe', recipeSchema);
 
-module.exports = Recipe;
+export default Recipe;

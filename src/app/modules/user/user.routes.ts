@@ -7,7 +7,25 @@ import { customerValidationsSchema } from '../customer/customer.validation';
 
 const router = express.Router();
 
-router.route('/').post(
+router.route('/create-customer').post(
+  multerUpload.single('file'),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = JSON.parse(req.body.data);
+    next();
+  },
+  validateRequest(customerValidationsSchema.createCustomerValidatonSchema),
+  UserControllers.createCustomer,
+);
+router.route('/create-provider').post(
+  multerUpload.single('file'),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = JSON.parse(req.body.data);
+    next();
+  },
+  validateRequest(customerValidationsSchema.createCustomerValidatonSchema),
+  UserControllers.createCustomer,
+);
+router.route('/create-admin').post(
   multerUpload.single('file'),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = JSON.parse(req.body.data);

@@ -1,10 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
-import {
-  CustomerModel,
-  IAddress,
-  ICustomer,
-  IUserName,
-} from './customer.interface';
+import { CustomerModel, ICustomer } from './customer.interface';
+import { IUserAddress, IUserName } from '../../interface/user';
 
 const customerNameSchema = new Schema<IUserName>(
   {
@@ -30,10 +26,10 @@ const customerNameSchema = new Schema<IUserName>(
   },
 );
 
-const customerAddressSchema = new Schema<IAddress>({
+const customerAddressSchema = new Schema<IUserAddress>({
   street: { type: String, required: true },
   city: { type: String, required: true },
-  state: { type: String, required: true },
+  district: { type: String, required: true },
   zipCode: { type: String, required: true },
 });
 

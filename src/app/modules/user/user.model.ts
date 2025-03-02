@@ -2,10 +2,29 @@ import bcrypt from 'bcrypt';
 import { Schema, model } from 'mongoose';
 import config from '../../config';
 import { METHOD, USER_ROLE, UserStatus } from './user.constant';
-import { IUser, UserModel } from './user.interface';
+import { IUser, IUserName, UserModel } from './user.interface';
 
+const userNameSchema = new Schema<IUserName>({
+  firstName: {
+    type: String,
+    required: [true, 'First Name is required'],
+    trim: true,
+    maxlength: [20, 'Name can not be more than 20 characters'],
+  },
+
+  lastName: {
+    type: String,
+    trim: true,
+    required: [true, 'Last Name is required'],
+    maxlength: [20, 'Name can not be more than 20 characters'],
+  },
+});
 const userSchema = new Schema<IUser, UserModel>(
   {
+    name: {
+      type: userNameSchema,
+      required: true,
+    },
     email: {
       type: String,
       required: true,
@@ -49,6 +68,10 @@ const userSchema = new Schema<IUser, UserModel>(
     timestamps: true,
   },
 );
+
+userSchema.virtual('fullName').get(function () {
+  return this?.name?.firstName + this?.name?.lastName;
+});
 
 userSchema.pre('save', async function (next) {
   // hashing password and save into DB

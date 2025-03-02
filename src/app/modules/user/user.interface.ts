@@ -1,9 +1,11 @@
 import { Document, Model } from 'mongoose';
 import { TMethod, USER_ROLE } from './user.constant';
+import { IUserName } from '../../interface/user';
 
 export type TUserRole = keyof typeof USER_ROLE;
 
 export interface IUser extends Document {
+  name: IUserName;
   email: string;
   password: string;
   passwordChangedAt?: Date;

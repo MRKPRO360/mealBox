@@ -1,17 +1,6 @@
 import { Document, Model, Types } from 'mongoose';
 import { TMethod } from '../user/user.constant';
-
-export type IUserName = {
-  firstName: string;
-  lastName: string;
-};
-
-export interface IAddress {
-  street: string;
-  city: string;
-  state: string;
-  zipCode: string;
-}
+import { IUserAddress, IUserName } from '../../interface/user';
 
 export interface ICustomer extends Document {
   name: IUserName;
@@ -21,7 +10,7 @@ export interface ICustomer extends Document {
   dietaryPreferences?: string[];
   orderHistory?: Types.ObjectId[];
   profileImg?: string;
-  address?: IAddress;
+  address?: IUserAddress;
   method?: TMethod;
 }
 

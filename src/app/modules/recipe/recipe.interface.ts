@@ -7,7 +7,7 @@ export interface IIngredient {
 export interface INutritionValues {
   calories: string;
   fat: string;
-  saturated_fat: string;
+  saturatedFat: string;
   carbohydrate: string;
   sugar: string;
   dietaryFiber: string;
