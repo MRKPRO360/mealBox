@@ -21,6 +21,7 @@ const createCustomerInDB = async (
   userData.method = payload.method;
   userData.phoneNumber = payload.phoneNumber;
   userData.role = USER_ROLE.customer;
+  userData.name = payload.name;
 
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -89,6 +90,7 @@ const createAdminInDB = async (
   userData.method = payload.method;
   userData.phoneNumber = payload.phoneNumber;
   userData.role = USER_ROLE.admin;
+  userData.name = payload.name;
 
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -157,6 +159,7 @@ const createProviderInDB = async (
   userData.method = payload.method;
   userData.phoneNumber = payload.phoneNumber;
   userData.role = USER_ROLE.mealProvider;
+  userData.name = payload.name;
 
   const session = await mongoose.startSession();
   session.startTransaction();

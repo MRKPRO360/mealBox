@@ -1,6 +1,12 @@
 import mongoose, { Schema } from 'mongoose';
 import { IProvider, ProviderModel } from './provider.interface';
-import { IUserAddress, IUserName } from '../../interface/user';
+import {
+  DISTRICTS,
+  DIVISIONS,
+  IUserAddress,
+  IUserName,
+} from '../../interface/user';
+import { User } from '../user/user.model';
 
 const providerNameSchema = new Schema<IUserName>({
   firstName: {
@@ -20,8 +26,8 @@ const providerNameSchema = new Schema<IUserName>({
 
 const providerAddressSchema = new Schema<IUserAddress>({
   street: { type: String, required: true },
-  city: { type: String, required: true },
-  district: { type: String, required: true },
+  city: { type: String, enum: DIVISIONS, required: true },
+  district: { type: String, enum: DISTRICTS, required: true },
   zipCode: { type: String, required: true },
 });
 
@@ -39,7 +45,6 @@ const providerSchema = new Schema<IProvider, ProviderModel>(
       unique: true,
       ref: 'User',
     },
-    assignedMeals: [{ type: Schema.Types.ObjectId, ref: 'Recipe' }],
     orderHistory: [{ type: Schema.Types.ObjectId, ref: 'Order' }],
     address: {
       type: providerAddressSchema,
@@ -72,7 +77,7 @@ providerSchema.pre('findOne', function (next) {
 
 //creating a custom static method
 providerSchema.statics.isproviderExistsById = async function (id: string) {
-  return await provider.findById(id);
+  return await User.findById(id);
 };
 
 const provider = mongoose.model<IProvider, ProviderModel>(

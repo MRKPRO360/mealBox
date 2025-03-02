@@ -2,7 +2,8 @@ import bcrypt from 'bcrypt';
 import { Schema, model } from 'mongoose';
 import config from '../../config';
 import { METHOD, USER_ROLE, UserStatus } from './user.constant';
-import { IUser, IUserName, UserModel } from './user.interface';
+import { IUser, UserModel } from './user.interface';
+import { IUserName } from '../../interface/user';
 
 const userNameSchema = new Schema<IUserName>({
   firstName: {

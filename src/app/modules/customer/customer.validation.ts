@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { DISTRICTS } from '../../interface/user';
 
 const createCustomerNameValidationSchema = z.object({
   firstName: z
@@ -26,7 +27,7 @@ const updateCustomerNameValidationSchema = z.object({
 const customerAddressValidationSchema = z.object({
   street: z.string().min(5).max(50).optional(),
   city: z.string().min(3).max(30).optional(),
-  state: z.string().min(2).max(2).optional(),
+  district: z.enum(DISTRICTS, { message: 'Invalid district' }),
   zipCode: z.string().min(5).max(5).optional(),
 });
 

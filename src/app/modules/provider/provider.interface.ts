@@ -9,7 +9,6 @@ export interface IProvider extends Document {
   phoneNumber: string;
   password: string;
   role: typeof USER_ROLE.mealProvider;
-  assignedMeals?: Types.ObjectId[]; // List of assigned meal id
   pricing: number;
   address: IUserAddress;
   profileImg: string;

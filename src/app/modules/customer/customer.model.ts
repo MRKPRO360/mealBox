@@ -1,6 +1,11 @@
 import mongoose, { Schema } from 'mongoose';
 import { CustomerModel, ICustomer } from './customer.interface';
-import { IUserAddress, IUserName } from '../../interface/user';
+import {
+  DISTRICTS,
+  DIVISIONS,
+  IUserAddress,
+  IUserName,
+} from '../../interface/user';
 
 const customerNameSchema = new Schema<IUserName>(
   {
@@ -28,8 +33,8 @@ const customerNameSchema = new Schema<IUserName>(
 
 const customerAddressSchema = new Schema<IUserAddress>({
   street: { type: String, required: true },
-  city: { type: String, required: true },
-  district: { type: String, required: true },
+  city: { type: String, enum: DIVISIONS, required: true },
+  district: { type: String, enum: DISTRICTS, required: true },
   zipCode: { type: String, required: true },
 });
 
