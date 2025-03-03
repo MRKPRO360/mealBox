@@ -80,8 +80,8 @@ providerSchema.statics.isproviderExistsById = async function (id: string) {
   return await User.findById(id);
 };
 
-const provider = mongoose.model<IProvider, ProviderModel>(
+const Provider = mongoose.model<IProvider, ProviderModel>(
   'provider',
   providerSchema,
 );
-export default provider;
+export default Provider;
