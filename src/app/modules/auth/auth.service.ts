@@ -9,9 +9,10 @@ import { ILogin } from './auth.interface';
 
 const loginUserFromDB = async (payload: ILogin) => {
   // CHECK IF USER EXISTS
-  const user = await User.findOne({ email: payload.email });
+  const user = await User.findOne({ email: payload.email }).select('+password');
 
   if (!user) throw new AppError(404, 'User not found!');
+  console.log(user);
 
   // CHECK IF USER IS BLOCKED
   if (user.status === 'blocked') throw new AppError(403, 'User is blocked!');

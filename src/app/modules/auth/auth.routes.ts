@@ -1,7 +1,7 @@
 import express from 'express';
 import validateRequest from '../../middlewares/validateRequest';
 import { authValidations } from './auth.validation';
-import { authControllers } from './auth.controllers';
+import { AuthControllers } from './auth.controller';
 import auth from '../../middlewares/auth';
 import { USER_ROLE } from '../user/user.constant';
 
@@ -11,13 +11,13 @@ router
   .route('/login')
   .post(
     validateRequest(authValidations.loginValidationSchema),
-    authControllers.loginUser,
+    AuthControllers.loginUser,
   );
 
 router.post(
   '/refresh-token',
   validateRequest(authValidations.refreshTokenValidationSchema),
-  authControllers.refreshToken,
+  AuthControllers.refreshToken,
 );
 
 router.post(
@@ -29,7 +29,7 @@ router.post(
     USER_ROLE.superAdmin,
   ),
   validateRequest(authValidations.changePasswordValidationSchema),
-  authControllers.changePassword,
+  AuthControllers.changePassword,
 );
 
 export default router;

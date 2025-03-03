@@ -47,13 +47,23 @@ const recipeSchema = new Schema<IRecipe>(
     nutritionValues: { type: nutritionValuesSchema, required: true },
     utensils: { type: [String], required: true },
     instructions: { type: [instructionSchema], required: true },
+    isDeleted: { type: Boolean, default: false }, // Optional field for soft delete functionality, default to false for active records.
   },
   {
     timestamps: true,
   },
 );
 
-// Create the Recipe model
+// FILTERING OUT THE DELETED RECIPE
+recipeSchema.pre('find', function (next) {
+  this.where('isDeleted', false);
+  next();
+});
+recipeSchema.pre('findOne', function (next) {
+  this.where('isDeleted', false);
+  next();
+});
+
 const Recipe = model<IRecipe>('Recipe', recipeSchema);
 
 export default Recipe;

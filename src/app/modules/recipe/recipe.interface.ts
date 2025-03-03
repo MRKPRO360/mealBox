@@ -35,4 +35,5 @@ export interface IRecipe {
   nutritionValues: INutritionValues;
   utensils: string[];
   instructions: IInstruction[];
+  isDeleted: boolean;
 }
