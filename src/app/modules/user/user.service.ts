@@ -8,6 +8,8 @@ import { USER_ROLE } from './user.constant';
 import Customer from '../customer/customer.model';
 import createToken from '../auth/auth.utils';
 import config from '../../config';
+import Provider from '../provider/provider.model';
+import Admin from '../admin/admin.model';
 
 const createCustomerInDB = async (
   file: any,
@@ -15,20 +17,20 @@ const createCustomerInDB = async (
   payload: ICustomer,
 ) => {
   const userData: Partial<IUser> = {};
+  const randomPass = Math.ceil(Math.random() * 1000000).toString();
 
-  userData.password = password;
+  userData.password = password || randomPass;
   userData.email = payload.email;
   userData.method = payload.method;
-  userData.phoneNumber = payload.phoneNumber;
+  userData.phoneNumber = payload.phoneNumber || '';
   userData.role = USER_ROLE.customer;
   userData.name = payload.name;
 
   const session = await mongoose.startSession();
   session.startTransaction();
+  console.log(userData);
 
   try {
-    payload.profileImg = file.path || '';
-
     // CREATING USER
     const newUser = await User.create([userData], { session });
 
@@ -36,6 +38,7 @@ const createCustomerInDB = async (
       throw new AppError(400, 'Failed to create user!');
     }
 
+    payload.profileImg = payload.profileImg || file?.path || '';
     payload.user = newUser[0]._id as Types.ObjectId;
 
     // CREATING CUSTOMER
@@ -52,6 +55,7 @@ const createCustomerInDB = async (
       email: newUser[0].email,
       role: newUser[0].role,
       id: newUser[0]._id,
+      profileImg: newCustomer[0].profileImg,
     };
 
     const accessToken = createToken(
@@ -108,9 +112,9 @@ const createAdminInDB = async (
     payload.user = newUser[0]._id as Types.ObjectId;
 
     // CREATING CUSTOMER
-    const newCustomer = await Customer.create([payload], { session });
+    const newAdmin = await Admin.create([payload], { session });
 
-    if (!newCustomer.length) {
+    if (!newAdmin.length) {
       throw new AppError(400, 'Failed to create admin!');
     }
 
@@ -121,6 +125,7 @@ const createAdminInDB = async (
       email: newUser[0].email,
       role: newUser[0].role,
       id: newUser[0]._id,
+      profileImg: newAdmin[0].profileImg,
     };
 
     const accessToken = createToken(
@@ -176,10 +181,10 @@ const createProviderInDB = async (
 
     payload.user = newUser[0]._id as Types.ObjectId;
 
-    // CREATING CUSTOMER
-    const newCustomer = await Customer.create([payload], { session });
+    // CREATING PROVIDER
+    const newProvider = await Provider.create([payload], { session });
 
-    if (!newCustomer.length) {
+    if (!newProvider.length) {
       throw new AppError(400, 'Failed to create meal provider!');
     }
 
@@ -190,6 +195,7 @@ const createProviderInDB = async (
       email: newUser[0].email,
       role: newUser[0].role,
       id: newUser[0]._id,
+      profileImg: newProvider[0].profileImg,
     };
 
     const accessToken = createToken(

@@ -36,7 +36,7 @@ const recipeSchema = new Schema<IRecipe>(
   {
     recipeName: { type: String, required: true },
     recipeImage: { type: String, required: true },
-    recipeMenuName: { type: String, required: true },
+    recipeMenuName: { type: Schema.ObjectId, required: true },
     description: { type: String, required: true },
     tags: { type: [String], required: true },
     allergens: { type: [String], required: true },

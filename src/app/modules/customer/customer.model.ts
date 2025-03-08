@@ -6,6 +6,7 @@ import {
   IUserAddress,
   IUserName,
 } from '../../interface/user';
+import { dietaryPreferences } from './customer.constant';
 
 const customerNameSchema = new Schema<IUserName>(
   {
@@ -19,8 +20,7 @@ const customerNameSchema = new Schema<IUserName>(
     lastName: {
       type: String,
       trim: true,
-      required: [true, 'Last Name is required'],
-      maxlength: [20, 'Name can not be more than 20 characters'],
+      default: '',
     },
   },
   {
@@ -44,14 +44,18 @@ const CustomerSchema = new Schema<ICustomer, CustomerModel>({
     required: true,
   },
   email: { type: String, required: true, unique: true },
-  phoneNumber: { type: String, required: true },
+  phoneNumber: { type: String },
   user: {
     type: Schema.Types.ObjectId,
     required: [true, 'User id is required'],
     unique: true,
     ref: 'User',
   },
-  dietaryPreferences: { type: [String], default: [] },
+  dietaryPreferences: {
+    type: [String],
+    enum: dietaryPreferences,
+    default: ['Vegetarian'],
+  },
   orderHistory: [{ type: Schema.Types.ObjectId, ref: 'Order' }],
   address: {
     type: customerAddressSchema,

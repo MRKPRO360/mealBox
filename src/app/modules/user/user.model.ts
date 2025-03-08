@@ -16,8 +16,7 @@ const userNameSchema = new Schema<IUserName>({
   lastName: {
     type: String,
     trim: true,
-    required: [true, 'Last Name is required'],
-    maxlength: [20, 'Name can not be more than 20 characters'],
+    default: '',
   },
 });
 const userSchema = new Schema<IUser, UserModel>(

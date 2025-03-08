@@ -63,6 +63,6 @@ adminSchema.virtual('fullName').get(function () {
 adminSchema.statics.isAdminExistsById = async function (id: string) {
   return await User.findById(id);
 };
-const admin = mongoose.model<IAdmin, AdminModel>('admin', adminSchema);
+const Admin = mongoose.model<IAdmin, AdminModel>('admin', adminSchema);
 
-export default admin;
+export default Admin;

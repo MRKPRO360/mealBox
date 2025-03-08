@@ -1,3 +1,5 @@
+import { Types } from 'mongoose';
+
 export interface IIngredient {
   name: string;
   quantity: string;
@@ -22,7 +24,7 @@ export interface IInstruction {
 }
 
 export interface IRecipe {
-  recipeMenuName: string;
+  recipeMenuName: Types.ObjectId;
   recipeImage: string;
   recipeName: string;
   description: string;

@@ -6,13 +6,15 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { User } from '../user/user.model';
 import { ILogin } from './auth.interface';
+import { USER_ROLE } from '../user/user.constant';
+import Customer from '../customer/customer.model';
+import Admin from '../admin/admin.model';
 
 const loginUserFromDB = async (payload: ILogin) => {
   // CHECK IF USER EXISTS
   const user = await User.findOne({ email: payload.email }).select('+password');
 
   if (!user) throw new AppError(404, 'User not found!');
-  console.log(user);
 
   // CHECK IF USER IS BLOCKED
   if (user.status === 'blocked') throw new AppError(403, 'User is blocked!');
@@ -28,10 +30,24 @@ const loginUserFromDB = async (payload: ILogin) => {
   // CHECK IF USER IS DELETED
   if (user.isDeleted) throw new AppError(403, 'User is deleted!');
 
+  let profileImg = '';
+
+  if (user.role === USER_ROLE.customer) {
+    const customer = await Customer.findOne({ user: user._id });
+
+    profileImg = customer?.profileImg as string;
+  }
+  if (user.role === USER_ROLE.admin) {
+    const admin = await Admin.findOne({ user: user._id });
+
+    profileImg = admin?.profileImg as string;
+  }
+
   const jwtPayload = {
     email: user.email,
     role: user.role,
     id: user._id,
+    profileImg: profileImg,
   };
 
   const accessToken = createToken(
@@ -70,6 +86,7 @@ const refreshTokenFromDB = async (token: string) => {
     email: user.email,
     role: user.role,
     id: user._id,
+    profileImg: user.profileImg,
   };
 
   const accessToken = createToken(

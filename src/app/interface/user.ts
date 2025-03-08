@@ -1,6 +1,6 @@
 export type IUserName = {
   firstName: string;
-  lastName: string;
+  lastName?: string;
 };
 
 export const DISTRICTS = [
