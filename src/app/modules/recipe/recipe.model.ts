@@ -48,6 +48,8 @@ const recipeSchema = new Schema<IRecipe>(
     utensils: { type: [String], required: true },
     instructions: { type: [instructionSchema], required: true },
     isDeleted: { type: Boolean, default: false }, // Optional field for soft delete functionality, default to false for active records.
+    pricePerServing: { type: String, required: true },
+    servings: { type: String, required: true },
   },
   {
     timestamps: true,
@@ -56,6 +58,18 @@ const recipeSchema = new Schema<IRecipe>(
 
 // FILTERING OUT THE DELETED RECIPE
 recipeSchema.pre('find', function (next) {
+  // this.model
+  //   .updateMany(
+  //     { isDeleted: { $ne: true } },
+  //     { $set: { pricePerServing: '9.99', servings: '2' } },
+  //     { multi: true }, // Update all matching documents
+  //   )
+  //   .exec();
+
+  this.where('isDeleted', false);
+  next();
+});
+recipeSchema.pre('findOne', function (next) {
   this.where('isDeleted', false);
   next();
 });

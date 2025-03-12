@@ -57,6 +57,7 @@ const CustomerSchema = new Schema<ICustomer, CustomerModel>({
     default: ['Vegetarian'],
   },
   orderHistory: [{ type: Schema.Types.ObjectId, ref: 'Order' }],
+  selectedMeals: [{ type: Schema.Types.ObjectId, ref: 'Meal' }],
   address: {
     type: customerAddressSchema,
   },

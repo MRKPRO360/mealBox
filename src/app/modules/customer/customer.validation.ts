@@ -41,9 +41,11 @@ const createCustomerValidatonSchema = z.object({
     phoneNumber: z.string().min(11).max(15).optional(),
     profileImg: z.string().optional(),
     dietaryPreferences: z
-      .enum(dietaryPreferences, {
-        message: 'Invalid dietary preference!',
-      })
+      .array(
+        z.enum(dietaryPreferences, {
+          message: 'Invalid dietary preference!',
+        }),
+      )
       .optional(),
     orderHistory: z
       .array(
@@ -62,8 +64,21 @@ const updateCustomerValidatonSchema = z.object({
     email: z.string().email().optional(),
     phoneNumber: z.string().min(11).max(15).optional(),
     profileImg: z.string().optional(),
-    dietaryPreferences: z.array(z.string()).optional(),
+    dietaryPreferences: z
+      .array(
+        z.enum(dietaryPreferences, {
+          message: 'Invalid dietary preference!',
+        }),
+      )
+      .optional(),
     orderHistory: z
+      .array(
+        z.string().refine((val) => /^[0-9a-fA-F]{24}$/.test(val), {
+          message: 'Invalid ObjectId format',
+        }),
+      )
+      .optional(),
+    selectedMeals: z
       .array(
         z.string().refine((val) => /^[0-9a-fA-F]{24}$/.test(val), {
           message: 'Invalid ObjectId format',

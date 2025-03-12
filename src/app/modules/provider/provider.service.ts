@@ -108,11 +108,11 @@ const updateProviderInDB = async (payload: Partial<IProvider>, file?: any) => {
     await session.commitTransaction();
     await session.endSession();
 
-    if (!updatedProvider) throw new AppError(400, 'Customer update failed!');
+    if (!updatedProvider) throw new AppError(400, 'Provider update failed!');
     const jwtPayload = {
       email: updatedProvider.email,
-      role: USER_ROLE.customer,
-      id: updatedProvider._id,
+      role: USER_ROLE.mealProvider,
+      id: user._id,
       profileImg: updatedProvider.profileImg,
     };
 

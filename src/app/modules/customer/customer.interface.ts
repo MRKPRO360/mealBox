@@ -10,6 +10,7 @@ export interface ICustomer extends Document {
   user: Types.ObjectId;
   dietaryPreferences?: DietaryPreference[];
   orderHistory?: Types.ObjectId[];
+  selectedMeals?: Types.ObjectId[];
   profileImg?: string;
   address?: IUserAddress;
   method?: TMethod;

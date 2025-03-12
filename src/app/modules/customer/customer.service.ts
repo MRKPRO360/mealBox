@@ -84,7 +84,7 @@ const updateCustomerInDB = async (payload: Partial<ICustomer>, file?: any) => {
 
     // If a new image is uploaded, update profileImg for both User and Customer
     if (file?.path) {
-      payload.profileImg = file.path || '';
+      payload.profileImg = file.path || payload.profileImg;
     }
 
     const { _id, ...data } = payload;
@@ -113,7 +113,7 @@ const updateCustomerInDB = async (payload: Partial<ICustomer>, file?: any) => {
     const jwtPayload = {
       email: updatedCustomer.email,
       role: USER_ROLE.customer,
-      id: updatedCustomer._id,
+      id: user._id,
       profileImg: updatedCustomer.profileImg,
     };
 
