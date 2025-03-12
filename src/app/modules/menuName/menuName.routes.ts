@@ -13,12 +13,12 @@ router
   .get(MenuNameControllers.getAllMenuName)
   .post(
     auth(USER_ROLE.mealProvider, USER_ROLE.admin, USER_ROLE.superAdmin),
-    validateRequest(MenuNameSchemaValidation.createMenuNameSchemaValidation),
     multerUpload.single('file'),
     (req: Request, res: Response, next: NextFunction) => {
       req.body = JSON.parse(req.body.data);
       next();
     },
+    validateRequest(MenuNameSchemaValidation.createMenuNameSchemaValidation),
     MenuNameControllers.createMenuName,
   );
 

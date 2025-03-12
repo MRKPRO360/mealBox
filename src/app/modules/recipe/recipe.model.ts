@@ -36,7 +36,7 @@ const recipeSchema = new Schema<IRecipe>(
   {
     recipeName: { type: String, required: true },
     recipeImage: { type: String, required: true },
-    recipeMenuName: { type: Schema.ObjectId, required: true },
+    recipeMenuName: { type: Schema.ObjectId, ref: 'MenuName', required: true },
     description: { type: String, required: true },
     tags: { type: [String], required: true },
     allergens: { type: [String], required: true },
@@ -56,10 +56,6 @@ const recipeSchema = new Schema<IRecipe>(
 
 // FILTERING OUT THE DELETED RECIPE
 recipeSchema.pre('find', function (next) {
-  this.where('isDeleted', false);
-  next();
-});
-recipeSchema.pre('findOne', function (next) {
   this.where('isDeleted', false);
   next();
 });

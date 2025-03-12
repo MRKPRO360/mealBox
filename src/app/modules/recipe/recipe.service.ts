@@ -11,12 +11,15 @@ const createRecipeInDB = async (file: any, payload: IRecipe) => {
 
 // GETTING A RECIPE
 const getSingleRecipeFromDB = async (id: string) => {
-  return await Recipe.findById(id);
+  return await Recipe.findById(id).populate('recipeMenuName').lean();
 };
 
 // GETTING ALL RECIPES
 const getAllRecipesFromDB = async (query: Record<string, unknown>) => {
-  const recipeQuery = new QueryBuilder(Recipe.find(), query)
+  const recipeQuery = new QueryBuilder(
+    Recipe.find().populate('recipeMenuName').lean(),
+    query,
+  )
     .search(recipeSearchableFields)
     .filter()
     .sort()

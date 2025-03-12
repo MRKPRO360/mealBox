@@ -222,8 +222,33 @@ const createProviderInDB = async (
   }
 };
 
+const getMe = async (userId: string, role: string) => {
+  let result = null;
+  if (role === USER_ROLE.customer) {
+    result = await Customer.findOne({ user: userId }).populate('user');
+  }
+  if (role === USER_ROLE.mealProvider) {
+    result = await Provider.findOne({ user: userId }).populate('user');
+  }
+
+  if (role === USER_ROLE.admin) {
+    result = await Admin.findOne({ user: userId }).populate('user');
+  }
+
+  return result;
+};
+
+const changeStatus = async (id: string, payload: { status: string }) => {
+  const result = await User.findByIdAndUpdate(id, payload, {
+    new: true,
+  });
+  return result;
+};
+
 export const UserServices = {
   createCustomerInDB,
   createAdminInDB,
   createProviderInDB,
+  getMe,
+  changeStatus,
 };

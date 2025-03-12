@@ -16,7 +16,9 @@ const updateSingleMenuFromDB = async (
   return await MenuName.findByIdAndUpdate(id, payload);
 };
 const deleteMenuFromDB = async (id: string) => {
-  return await MenuName.findByIdAndDelete(id);
+  return await MenuName.findByIdAndUpdate(id, {
+    isDeleted: true,
+  });
 };
 
 export const MenuNameServices = {

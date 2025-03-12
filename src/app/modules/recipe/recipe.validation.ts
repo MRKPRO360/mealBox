@@ -26,8 +26,49 @@ const instructionSchema = z.object({
   description: z.string().min(1, { message: 'Description is required' }),
 });
 
+const updateIngredientSchema = z.object({
+  name: z
+    .string()
+    .min(1, { message: 'Ingredient name is required' })
+    .optional(),
+  quantity: z.string().min(1, { message: 'Quantity is required' }).optional(),
+  contains: z.array(z.string()).optional(), // Optional field for allergens
+});
+
+const updateNutritionValuesSchema = z.object({
+  calories: z.string().min(1, { message: 'Calories are required' }).optional(),
+  fat: z.string().min(1, { message: 'Fat is required' }).optional(),
+  saturatedFat: z
+    .string()
+    .min(1, { message: 'Saturated fat is required' })
+    .optional(),
+  carbohydrate: z
+    .string()
+    .min(1, { message: 'Carbohydrate is required' })
+    .optional(),
+  sugar: z.string().min(1, { message: 'Sugar is required' }).optional(),
+  dietaryFiber: z
+    .string()
+    .min(1, { message: 'Dietary fiber is required' })
+    .optional(),
+  protein: z.string().min(1, { message: 'Protein is required' }).optional(),
+  cholesterol: z
+    .string()
+    .min(1, { message: 'Cholesterol is required' })
+    .optional(),
+  sodium: z.string().min(1, { message: 'Sodium is required' }).optional(),
+});
+
+const updateInstructionSchema = z.object({
+  step: z.number().min(1, { message: 'Step number is required' }).optional(),
+  description: z
+    .string()
+    .min(1, { message: 'Description is required' })
+    .optional(),
+});
+
 // Define the Recipe schema
-const createRecipeSchema = z.object({
+const createRecipeValidationSchema = z.object({
   body: z.object({
     recipeName: z.string().min(1, { message: 'Recipe name is required' }),
     recipeMenuName: z
@@ -54,7 +95,55 @@ const createRecipeSchema = z.object({
   }),
 });
 
+const updateRecipeValidationSchema = z.object({
+  body: z.object({
+    recipeName: z
+      .string()
+      .min(1, { message: 'Recipe name is required' })
+      .optional(),
+    recipeMenuName: z
+      .string()
+      .min(1, { message: 'Recipe menu name is required' })
+      .optional(),
+    description: z
+      .string()
+      .min(1, { message: 'Description is required' })
+      .optional(),
+    tags: z
+      .array(z.string())
+      .min(1, { message: 'At least one tag is required' })
+      .optional(),
+    allergens: z.array(z.string()).default([]).optional(),
+    totalTime: z
+      .string()
+      .min(1, { message: 'Total time is required' })
+      .optional(),
+    prepTime: z
+      .string()
+      .min(1, { message: 'Prep time is required' })
+      .optional(),
+    difficulty: z
+      .string()
+      .min(1, { message: 'Difficulty is required' })
+      .optional(),
+    ingredients: z
+      .array(updateIngredientSchema)
+      .min(1, { message: 'At least one ingredient is required' })
+      .optional(),
+    nutritionValues: updateNutritionValuesSchema.optional(),
+    utensils: z
+      .array(z.string())
+      .min(1, { message: 'At least one utensil is required' })
+      .optional(),
+    instructions: z
+      .array(updateInstructionSchema)
+      .min(1, { message: 'At least one instruction is required' })
+      .optional(),
+  }),
+});
+
 // Export the schemas
 export const RecipeValidationSchema = {
-  createRecipeSchema,
+  createRecipeValidationSchema,
+  updateRecipeValidationSchema,
 };
