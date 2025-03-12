@@ -3,6 +3,7 @@ import { USER_ROLE } from '../user/user.constant';
 import { IUserAddress, IUserName } from '../../interface/user';
 
 export interface IProvider extends Document {
+  _id: Types.ObjectId;
   name: IUserName;
   email: string;
   user: Types.ObjectId;

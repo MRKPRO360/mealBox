@@ -25,6 +25,17 @@ const getSingleProvider = catchAsync(async (req, res) => {
   });
 });
 
+const updateProvider = catchAsync(async (req, res) => {
+  const result = await ProviderServices.updateProviderInDB(req.body, req.file);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Provider updated successfully!',
+    data: result,
+  });
+});
+
 const deleteProvider = catchAsync(async (req, res) => {
   const { id } = req.params;
   const provider = await ProviderServices.deleteProviderFromDB(id);
@@ -40,5 +51,6 @@ const deleteProvider = catchAsync(async (req, res) => {
 export const ProviderControllers = {
   getAllProviders,
   getSingleProvider,
+  updateProvider,
   deleteProvider,
 };

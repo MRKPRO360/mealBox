@@ -25,20 +25,32 @@ const getSingleCustomer = catchAsync(async (req, res) => {
   });
 });
 
+const updateCustomer = catchAsync(async (req, res) => {
+  const result = await CustomerServices.updateCustomerInDB(req.body, req.file);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Customer updated successfully!',
+    data: result,
+  });
+});
+
 const deleteCustomer = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const customers = await CustomerServices.deleteCustomerFromDB(id);
+  const customer = await CustomerServices.deleteCustomerFromDB(id);
 
   sendResponse(res, {
     statusCode: 200,
     success: true,
     message: 'Customer deleted successfully',
-    data: customers,
+    data: customer,
   });
 });
 
 export const CustomerControllers = {
   getAllCustomers,
   getSingleCustomer,
+  updateCustomer,
   deleteCustomer,
 };
