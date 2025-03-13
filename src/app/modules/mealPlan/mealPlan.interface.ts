@@ -1,6 +1,6 @@
 import { Types } from 'mongoose';
 
 export interface IMealPlan {
-  week: string;
-  meals: Types.ObjectId;
+  week: Date;
+  selectedMeals: Types.ObjectId[];
 }

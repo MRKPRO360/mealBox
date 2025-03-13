@@ -16,6 +16,15 @@ router
     MealPlanControllers.createMealPlan,
   );
 
+// How many recipes in a week
+router.get('/week', MealPlanControllers.getMealPlanForWeek);
+
+// All plan for a month
+router.get('/monthly-plan', MealPlanControllers.getMonthlyMealPlan);
+
+// All weeks
+router.get('/recent-plan', MealPlanControllers.getCurrentAndLastMonthMealPlans);
+
 router
   .route('/:id')
   .delete(

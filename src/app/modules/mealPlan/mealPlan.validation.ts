@@ -3,7 +3,7 @@ import { z } from 'zod';
 const createMealPlanValidationSchema = z.object({
   body: z.object({
     week: z.string(),
-    selectedMeal: z
+    selectedMeals: z
       .array(
         z.string().refine((val) => /^[0-9a-fA-F]{24}$/.test(val), {
           message: 'Invalid ObjectId format',
@@ -16,7 +16,7 @@ const createMealPlanValidationSchema = z.object({
 const updateMealPlanValidationSchema = z.object({
   body: z.object({
     week: z.string().optional(),
-    selectedMeal: z
+    selectedMeals: z
       .array(
         z.string().refine((val) => /^[0-9a-fA-F]{24}$/.test(val), {
           message: 'Invalid ObjectId format',

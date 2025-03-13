@@ -5,6 +5,7 @@ import CustomerRouter from '../modules/customer/customer.routes';
 import ProviderRouter from '../modules/provider/provider.routes';
 import AuthRouter from '../modules/auth/auth.routes';
 import MenuNameRouter from '../modules/menuName/menuName.routes';
+import MealPlanRouter from '../modules/mealPlan/mealPlan.routes';
 
 const router = Router();
 
@@ -16,6 +17,10 @@ const moduleRoutes = [
   {
     path: '/menu-names',
     route: MenuNameRouter,
+  },
+  {
+    path: '/meal-plans',
+    route: MealPlanRouter,
   },
   {
     path: '/users',

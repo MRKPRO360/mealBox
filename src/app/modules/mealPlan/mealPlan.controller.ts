@@ -12,6 +12,20 @@ const createMealPlan = catchAsync(async (req, res) => {
     data: MealPlan,
   });
 });
+
+const getMealPlanForWeek = catchAsync(async (req, res) => {
+  const { week } = req.query;
+
+  const mealPlan = await MealPlanServices.getMealPlanForWeek(week as string);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Meal plan retrieved successfully!',
+    data: mealPlan,
+  });
+});
+
 const getAllMealPlan = catchAsync(async (req, res) => {
   const MealPlan = await MealPlanServices.getAllMealPlansFromDB();
 
@@ -22,6 +36,30 @@ const getAllMealPlan = catchAsync(async (req, res) => {
     data: MealPlan,
   });
 });
+
+const getMonthlyMealPlan = catchAsync(async (req, res) => {
+  const MealPlan = await MealPlanServices.getMonthlyMealPlanFromDB();
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Monthly meal plan retrieved successfully!',
+    data: MealPlan,
+  });
+});
+
+const getCurrentAndLastMonthMealPlans = catchAsync(async (req, res) => {
+  const MealPlan =
+    await MealPlanServices.getCurrentAndLastMonthMealPlansFromDB();
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Meal plan weeks retrieved successfully!',
+    data: MealPlan,
+  });
+});
+
 const updateMealPlan = catchAsync(async (req, res) => {
   const { id } = req.params;
 
@@ -56,4 +94,7 @@ export const MealPlanControllers = {
   getAllMealPlan,
   updateMealPlan,
   deleteMealPlan,
+  getMealPlanForWeek,
+  getMonthlyMealPlan,
+  getCurrentAndLastMonthMealPlans,
 };
