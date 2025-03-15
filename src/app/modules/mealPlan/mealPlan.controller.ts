@@ -79,7 +79,7 @@ const updateMealPlan = catchAsync(async (req, res) => {
 const deleteMealPlan = catchAsync(async (req, res) => {
   const { id } = req.params;
 
-  const MealPlan = await MealPlanServices.deleteMenuFromDB(id);
+  const MealPlan = await MealPlanServices.deleteMealPlanFromDB(id);
 
   sendResponse(res, {
     statusCode: 200,

@@ -34,7 +34,7 @@ router
   )
   .patch(
     auth(USER_ROLE.mealProvider, USER_ROLE.admin, USER_ROLE.superAdmin),
-    MealPlanControllers.deleteMealPlan,
+    MealPlanControllers.updateMealPlan,
   );
 
 export default router;

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const createMealPlanValidationSchema = z.object({
+const createPersonalMealPlanValidationSchema = z.object({
   body: z.object({
     week: z.string(),
     selectedMeals: z.array(
@@ -11,7 +11,7 @@ const createMealPlanValidationSchema = z.object({
   }),
 });
 
-const updateMealPlanValidationSchema = z.object({
+const updatePersonalMealPlanValidationSchema = z.object({
   body: z.object({
     week: z.string().optional(),
     selectedMeals: z
@@ -23,7 +23,7 @@ const updateMealPlanValidationSchema = z.object({
       .optional(),
   }),
 });
-export const MealPlanValidation = {
-  createMealPlanValidationSchema,
-  updateMealPlanValidationSchema,
+export const PersonalMealPlanValidation = {
+  createPersonalMealPlanValidationSchema,
+  updatePersonalMealPlanValidationSchema,
 };

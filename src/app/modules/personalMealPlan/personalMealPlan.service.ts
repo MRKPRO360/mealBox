@@ -1,11 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { JwtPayload } from 'jsonwebtoken';
 import AppError from '../../errors/AppError';
 import Recipe from '../recipe/recipe.model';
-import { IMealPlan } from './mealPlan.interface';
-import MealPlan from './mealPlan.model';
+import { IPersonalMealPlan } from './personalMealPlan.interface';
+import PersonalMealPlan from './personalMealPlan.model';
 
-const createMealPlanInDB = async (payload: IMealPlan) => {
+const createPersonalMealPlanInDB = async (
+  payload: IPersonalMealPlan,
+  user: JwtPayload,
+) => {
   const mealIds = payload.selectedMeals;
 
   // Step 1: Check if all meal IDs are valid (exist in the Recipe collection)
@@ -28,7 +32,7 @@ const createMealPlanInDB = async (payload: IMealPlan) => {
   }
 
   // Find the most recent meal plan
-  const latestMealPlan = await MealPlan.findOne().sort({ week: -1 });
+  const latestMealPlan = await PersonalMealPlan.findOne().sort({ week: -1 });
 
   if (latestMealPlan) {
     // Calculate the difference in days
@@ -46,18 +50,19 @@ const createMealPlanInDB = async (payload: IMealPlan) => {
     }
   }
 
-  return await MealPlan.create(payload);
+  return await PersonalMealPlan.create({ ...payload, customer: user });
 };
 
-const getMealPlanForWeek = async (week: string) => {
+const getPersonalMealPlanForWeek = async (week: string) => {
   if (!week) new AppError(400, 'Week is not provided');
 
-  return await MealPlan.findOne({ week }).populate('selectedMeals');
+  return await PersonalMealPlan.findOne({ week }).populate('selectedMeals');
 };
 
-const getMonthlyMealPlanFromDB = async () => {
+const getMonthlyPersonalMealPlanFromDB = async () => {
   const currentMonth = new Date().getMonth() + 1; // Get current month (1-based index)
-  const mealPlans = await MealPlanServices.getAllMealPlansFromDB();
+  const mealPlans =
+    await PersonalMealPlanServices.getAllPersonalMealPlansFromDB();
 
   // Filter only the meal plans in the current month
   const filteredPlans = mealPlans.filter((plan) => {
@@ -68,18 +73,18 @@ const getMonthlyMealPlanFromDB = async () => {
   return filteredPlans;
 };
 
-const getAllMealPlansFromDB = async () => {
-  return await MealPlan.find({}).populate('selectedMeals');
+const getAllPersonalMealPlansFromDB = async () => {
+  return await PersonalMealPlan.find({}).populate('selectedMeals');
 };
 
-const getCurrentAndLastMonthMealPlansFromDB = async () => {
+const getCurrentAndLastMonthPersonalMealPlansFromDB = async () => {
   const today = new Date();
   const currentMonth = today.getMonth(); // 0-based index (March = 2)
   const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1; // Handle January case
   const currentYear = today.getFullYear();
   const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear; // Handle December case
 
-  const mealPlans = await MealPlan.find({
+  const mealPlans = await PersonalMealPlan.find({
     $or: [
       {
         week: {
@@ -99,24 +104,24 @@ const getCurrentAndLastMonthMealPlansFromDB = async () => {
   return mealPlans;
 };
 
-const updateSingleMealPlanFromDB = async (
+const updateSinglePersonalMealPlanFromDB = async (
   id: string,
-  payload: Partial<IMealPlan>,
+  payload: Partial<IPersonalMealPlan>,
 ) => {
-  return await MealPlan.findByIdAndUpdate(id, payload);
+  return await PersonalMealPlan.findByIdAndUpdate(id, payload);
 };
-const deleteMealPlanFromDB = async (id: string) => {
-  return await MealPlan.findByIdAndUpdate(id, {
+const deletePersonalMealPlanFromDB = async (id: string) => {
+  return await PersonalMealPlan.findByIdAndUpdate(id, {
     isDeleted: true,
   });
 };
 
-export const MealPlanServices = {
-  createMealPlanInDB,
-  getAllMealPlansFromDB,
-  getCurrentAndLastMonthMealPlansFromDB,
-  updateSingleMealPlanFromDB,
-  deleteMealPlanFromDB,
-  getMealPlanForWeek,
-  getMonthlyMealPlanFromDB,
+export const PersonalMealPlanServices = {
+  createPersonalMealPlanInDB,
+  getAllPersonalMealPlansFromDB,
+  getCurrentAndLastMonthPersonalMealPlansFromDB,
+  updateSinglePersonalMealPlanFromDB,
+  deletePersonalMealPlanFromDB,
+  getPersonalMealPlanForWeek,
+  getMonthlyPersonalMealPlanFromDB,
 };
