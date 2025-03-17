@@ -38,11 +38,13 @@ const createPersonalMealPlanInDB = async (
     // Calculate the difference in days
     const lastWeek = new Date(latestMealPlan.week);
     const newWeek = new Date(payload.week);
+    console.log({ lastWeek, newWeek });
+
     const diffInDays =
       (newWeek.getTime() - lastWeek.getTime()) / (1000 * 60 * 60 * 24);
 
     // Validate the difference should be exactly 7 days
-    if (diffInDays !== 7) {
+    if (diffInDays < 6) {
       throw new AppError(
         400,
         'Each meal plan week should be exactly 7 days apart.',
@@ -50,19 +52,66 @@ const createPersonalMealPlanInDB = async (
     }
   }
 
-  return await PersonalMealPlan.create({ ...payload, customer: user });
+  return await PersonalMealPlan.create({ ...payload, user: user.id });
 };
 
-const getPersonalMealPlanForWeek = async (week: string) => {
-  if (!week) new AppError(400, 'Week is not provided');
+const getPersonalMealPlanForWeek = async (week: string, user: JwtPayload) => {
+  if (!week) throw new AppError(400, 'Week is not provided');
 
-  return await PersonalMealPlan.findOne({ week }).populate('selectedMeals');
+  return await PersonalMealPlan.findOne({ week, user: user.id }).populate(
+    'selectedMeals',
+  );
 };
 
-const getMonthlyPersonalMealPlanFromDB = async () => {
+// SHOULD BE ADDED FOR PROVIDER
+const deletePersonalMealPlanForWeek = async (
+  week: string,
+  user: JwtPayload,
+) => {
+  if (!week) throw new AppError(400, 'Week is not provided');
+
+  const personalMealPlanForWeek = await PersonalMealPlan.findOneAndUpdate(
+    { week, user: user.id },
+    {
+      isDeleted: true,
+    },
+    {
+      new: true,
+      runValidators: true,
+    },
+  ).lean();
+
+  if (!personalMealPlanForWeek) throw new AppError(404, 'Meal plan not found'); // ✅ Ensure a document is found
+  return personalMealPlanForWeek;
+};
+
+// SHOULD BE ADDED FOR PROVIDER
+
+const removeMealFromWeekFromDB = async (
+  weekId: string,
+  mealId: string,
+  user: JwtPayload,
+) => {
+  if (!weekId || !mealId) {
+    throw new AppError(400, 'Week ID or Meal ID is missing.');
+  }
+
+  const updatedMealPlan = await PersonalMealPlan.findOneAndUpdate(
+    { week: weekId, user: user.id }, // Ensure the meal plan belongs to the user
+    { $pull: { selectedMeals: mealId } }, // Remove meal from array
+    { new: true }, // Return the updated document
+  );
+
+  if (!updatedMealPlan)
+    throw new AppError(400, 'Meal plan not found or unauthorized.');
+
+  return updatedMealPlan;
+};
+
+const getMonthlyPersonalMealPlanFromDB = async (user: JwtPayload) => {
   const currentMonth = new Date().getMonth() + 1; // Get current month (1-based index)
   const mealPlans =
-    await PersonalMealPlanServices.getAllPersonalMealPlansFromDB();
+    await PersonalMealPlanServices.getAllPersonalMealPlansFromDB(user);
 
   // Filter only the meal plans in the current month
   const filteredPlans = mealPlans.filter((plan) => {
@@ -73,11 +122,15 @@ const getMonthlyPersonalMealPlanFromDB = async () => {
   return filteredPlans;
 };
 
-const getAllPersonalMealPlansFromDB = async () => {
-  return await PersonalMealPlan.find({}).populate('selectedMeals');
+const getAllPersonalMealPlansFromDB = async (user: JwtPayload) => {
+  return await PersonalMealPlan.find({ user: user.id }).populate(
+    'selectedMeals',
+  );
 };
 
-const getCurrentAndLastMonthPersonalMealPlansFromDB = async () => {
+const getCurrentAndLastMonthPersonalMealPlansFromDB = async (
+  user: JwtPayload,
+) => {
   const today = new Date();
   const currentMonth = today.getMonth(); // 0-based index (March = 2)
   const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1; // Handle January case
@@ -85,6 +138,7 @@ const getCurrentAndLastMonthPersonalMealPlansFromDB = async () => {
   const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear; // Handle December case
 
   const mealPlans = await PersonalMealPlan.find({
+    user: user.id,
     $or: [
       {
         week: {
@@ -122,6 +176,8 @@ export const PersonalMealPlanServices = {
   getCurrentAndLastMonthPersonalMealPlansFromDB,
   updateSinglePersonalMealPlanFromDB,
   deletePersonalMealPlanFromDB,
+  deletePersonalMealPlanForWeek,
+  removeMealFromWeekFromDB,
   getPersonalMealPlanForWeek,
   getMonthlyPersonalMealPlanFromDB,
 };

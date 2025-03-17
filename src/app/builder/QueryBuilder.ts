@@ -17,7 +17,7 @@ class QueryBuilder<T> {
           (field) =>
             ({
               [field]: { $regex: searchTerm, $options: 'i' },
-            } as FilterQuery<T>)
+            }) as FilterQuery<T>,
         ),
       });
     }
@@ -50,7 +50,7 @@ class QueryBuilder<T> {
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
 
     this.modelQuery = this.modelQuery.find(
-      JSON.parse(queryStr) as FilterQuery<T>
+      JSON.parse(queryStr) as FilterQuery<T>,
     );
 
     return this;
@@ -66,10 +66,12 @@ class QueryBuilder<T> {
 
   paginate() {
     const page = Number(this?.query?.page) || 1;
-    const limit = Number(this?.query?.limit) || 10;
-    const skip = (page - 1) * limit;
+    const limit = this?.query?.limit ? Number(this.query.limit) : null;
+    const skip = (page - 1) * (limit || 10);
 
-    this.modelQuery = this.modelQuery.skip(skip).limit(limit);
+    if (limit) {
+      this.modelQuery = this.modelQuery.skip(skip).limit(limit);
+    }
 
     return this;
   }

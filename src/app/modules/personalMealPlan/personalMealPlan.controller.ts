@@ -21,6 +21,7 @@ const getPersonalMealPlanForWeek = catchAsync(async (req, res) => {
 
   const result = await PersonalMealPlanServices.getPersonalMealPlanForWeek(
     week as string,
+    req.user!,
   );
 
   sendResponse(res, {
@@ -30,9 +31,26 @@ const getPersonalMealPlanForWeek = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const deletePersonalMealPlanForWeek = catchAsync(async (req, res) => {
+  const { week } = req.query;
+
+  const result = await PersonalMealPlanServices.deletePersonalMealPlanForWeek(
+    week as string,
+    req.user!,
+  );
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Personal meal plan deleted successfully!',
+    data: result,
+  });
+});
 
 const getAllPersonalMealPlan = catchAsync(async (req, res) => {
-  const result = await PersonalMealPlanServices.getAllPersonalMealPlansFromDB();
+  const result = await PersonalMealPlanServices.getAllPersonalMealPlansFromDB(
+    req.user!,
+  );
 
   sendResponse(res, {
     statusCode: 200,
@@ -44,7 +62,7 @@ const getAllPersonalMealPlan = catchAsync(async (req, res) => {
 
 const getMonthlyPersonalMealPlan = catchAsync(async (req, res) => {
   const result =
-    await PersonalMealPlanServices.getMonthlyPersonalMealPlanFromDB();
+    await PersonalMealPlanServices.getMonthlyPersonalMealPlanFromDB(req.user!);
 
   sendResponse(res, {
     statusCode: 200,
@@ -56,7 +74,9 @@ const getMonthlyPersonalMealPlan = catchAsync(async (req, res) => {
 
 const getCurrentAndLastMonthPersonalMealPlans = catchAsync(async (req, res) => {
   const result =
-    await PersonalMealPlanServices.getCurrentAndLastMonthPersonalMealPlansFromDB();
+    await PersonalMealPlanServices.getCurrentAndLastMonthPersonalMealPlansFromDB(
+      req.user!,
+    );
 
   sendResponse(res, {
     statusCode: 200,
@@ -97,11 +117,31 @@ const deletePersonalMealPlan = catchAsync(async (req, res) => {
   });
 });
 
+const removeMealFromWeek = catchAsync(async (req, res) => {
+  const { weekId, mealId } = req.params;
+  console.log(weekId, mealId);
+
+  const result = await PersonalMealPlanServices.removeMealFromWeekFromDB(
+    weekId,
+    mealId,
+    req.user!,
+  );
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Personal meal plan deleted successfully!',
+    data: result,
+  });
+});
+
 export const PersonalMealPlanControllers = {
   createPersonalMealPlan,
   getAllPersonalMealPlan,
   updatePersonalMealPlan,
   deletePersonalMealPlan,
+  deletePersonalMealPlanForWeek,
+  removeMealFromWeek,
   getPersonalMealPlanForWeek,
   getMonthlyPersonalMealPlan,
   getCurrentAndLastMonthPersonalMealPlans,
