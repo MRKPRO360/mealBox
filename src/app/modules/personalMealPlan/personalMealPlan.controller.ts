@@ -31,6 +31,7 @@ const getPersonalMealPlanForWeek = catchAsync(async (req, res) => {
     data: result,
   });
 });
+
 const deletePersonalMealPlanForWeek = catchAsync(async (req, res) => {
   const { week } = req.query;
 
@@ -42,7 +43,26 @@ const deletePersonalMealPlanForWeek = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: 'Personal meal plan deleted successfully!',
+    message: 'Deleted weekly personal meals successfully!',
+    data: result,
+  });
+});
+
+const updateWeeklyPlan = catchAsync(async (req, res) => {
+  const { id } = req.params; // Get meal plan ID from request params
+  const { week, selectedMeals } = req.body; // Get week and selectedMeals from request body
+
+  const result = await PersonalMealPlanServices.updateWeeklyPlanInDB(
+    id,
+    week as string,
+    selectedMeals,
+    req.user!,
+  );
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Deleted weekly personal meals successfully!',
     data: result,
   });
 });
@@ -130,7 +150,7 @@ const removeMealFromWeek = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: 'Personal meal plan deleted successfully!',
+    message: 'Successfully removed meal from week!',
     data: result,
   });
 });
@@ -143,6 +163,7 @@ export const PersonalMealPlanControllers = {
   deletePersonalMealPlanForWeek,
   removeMealFromWeek,
   getPersonalMealPlanForWeek,
+  updateWeeklyPlan,
   getMonthlyPersonalMealPlan,
   getCurrentAndLastMonthPersonalMealPlans,
 };

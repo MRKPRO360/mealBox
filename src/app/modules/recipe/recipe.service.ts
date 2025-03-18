@@ -34,6 +34,11 @@ const getAllRecipesFromDB = async (query: Record<string, unknown>) => {
   };
 };
 
+// GETTING ALL RECIPES NAME AND ID
+const getAllRecipesNameAndIdFromDB = async () => {
+  return await Recipe.find().select('recipeName _id');
+};
+
 // UPDATING A RECIPE
 
 const updateRecipeInDB = async (id: string, payload: Partial<IRecipe>) => {
@@ -57,4 +62,5 @@ export const RecipeServices = {
   getAllRecipesFromDB,
   updateRecipeInDB,
   deleteRecipeInDB,
+  getAllRecipesNameAndIdFromDB,
 };

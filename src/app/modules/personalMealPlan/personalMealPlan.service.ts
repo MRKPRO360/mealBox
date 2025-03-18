@@ -5,6 +5,7 @@ import AppError from '../../errors/AppError';
 import Recipe from '../recipe/recipe.model';
 import { IPersonalMealPlan } from './personalMealPlan.interface';
 import PersonalMealPlan from './personalMealPlan.model';
+import { IRecipe } from '../recipe/recipe.interface';
 
 const createPersonalMealPlanInDB = async (
   payload: IPersonalMealPlan,
@@ -86,7 +87,6 @@ const deletePersonalMealPlanForWeek = async (
 };
 
 // SHOULD BE ADDED FOR PROVIDER
-
 const removeMealFromWeekFromDB = async (
   weekId: string,
   mealId: string,
@@ -104,6 +104,36 @@ const removeMealFromWeekFromDB = async (
 
   if (!updatedMealPlan)
     throw new AppError(400, 'Meal plan not found or unauthorized.');
+
+  return updatedMealPlan;
+};
+
+const updateWeeklyPlanInDB = async (
+  mealPlanId: string,
+  week: string,
+  selectedMeals: IRecipe[],
+  user: JwtPayload,
+) => {
+  // Check if another meal plan already exists with the same week (excluding the current one) MEANS UPDATING OTHER WEEKLY PLAN
+
+  const existingPlan = await PersonalMealPlan.findOne({
+    week,
+    user: user.id,
+    _id: mealPlanId,
+  });
+
+  if (!existingPlan)
+    throw new AppError(400, 'A meal plan for this week already exists ):');
+
+  const updatedMealPlan = await PersonalMealPlan.findByIdAndUpdate(
+    mealPlanId,
+    { week, selectedMeals },
+    { new: true, runValidators: true },
+  );
+
+  if (!updatedMealPlan) {
+    throw new AppError(400, 'Meal plan not found ):');
+  }
 
   return updatedMealPlan;
 };
@@ -178,6 +208,7 @@ export const PersonalMealPlanServices = {
   deletePersonalMealPlanFromDB,
   deletePersonalMealPlanForWeek,
   removeMealFromWeekFromDB,
+  updateWeeklyPlanInDB,
   getPersonalMealPlanForWeek,
   getMonthlyPersonalMealPlanFromDB,
 };

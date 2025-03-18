@@ -22,6 +22,8 @@ router
   )
   .get(RecipeControllers.getAllRecipes);
 
+router.get('/nameId', RecipeControllers.getAllRecipesNameAndId);
+
 router
   .route('/:id')
   .patch(
