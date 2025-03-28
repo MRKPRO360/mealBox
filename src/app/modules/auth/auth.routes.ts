@@ -25,7 +25,7 @@ router.post(
   auth(
     USER_ROLE.customer,
     USER_ROLE.admin,
-    USER_ROLE.mealProvider,
+    USER_ROLE.provider,
     USER_ROLE.superAdmin,
   ),
   validateRequest(authValidations.changePasswordValidationSchema),

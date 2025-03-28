@@ -19,12 +19,12 @@ const createCustomer = catchAsync(async (req, res) => {
   });
 });
 const createProvider = catchAsync(async (req, res) => {
-  const { password, ...customerData } = req.body;
+  const { password, ...providerData } = req.body;
 
-  const result = await UserServices.createCustomerInDB(
+  const result = await UserServices.createProviderInDB(
     req.file,
     password,
-    customerData,
+    providerData,
   );
 
   sendResponse(res, {
@@ -35,12 +35,12 @@ const createProvider = catchAsync(async (req, res) => {
   });
 });
 const createAdmin = catchAsync(async (req, res) => {
-  const { password, ...customerData } = req.body;
+  const { password, ...adminData } = req.body;
 
   const result = await UserServices.createAdminInDB(
     req.file,
     password,
-    customerData,
+    adminData,
   );
 
   sendResponse(res, {

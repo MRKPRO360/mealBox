@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { CUISINE_SPECIALTIES } from './provider.constant';
 
 const createProviderNameValidationSchema = z.object({
   firstName: z
@@ -37,6 +38,13 @@ const createProviderValidatonSchema = z.object({
     email: z.string().email(),
     phoneNumber: z.string().min(11).max(15),
     profileImg: z.string().optional(),
+    cusineSpecialties: z
+      .array(
+        z.enum(CUISINE_SPECIALTIES, {
+          message: 'Invalid cuisine specialty!',
+        }),
+      )
+      .optional(),
   }),
 });
 
@@ -47,6 +55,26 @@ const updateProviderValidatonSchema = z.object({
     email: z.string().email().optional(),
     phoneNumber: z.string().min(11).max(15).optional(),
     profileImg: z.string().optional(),
+    cusineSpecialties: z
+      .array(
+        z.enum(CUISINE_SPECIALTIES, {
+          message: 'Invalid cuisine specialty!',
+        }),
+      )
+      .optional(),
+    customerReviews: z
+      .array(
+        z.object({
+          rating: z
+            .string()
+            .regex(/^[1-5]$/, 'Rating must be a number between 1 and 5')
+            .optional(), // Ensuring it's a string representing 1-5
+          review: z.string().min(1, 'Review cannot be empty').optional(),
+        }),
+      )
+      .optional(),
+    availableMealOptions: z.array(z.string()).optional(),
+    orderHistory: z.array(z.string()).optional(),
   }),
 });
 

@@ -11,7 +11,7 @@ const router = express.Router();
 router
   .route('/')
   .post(
-    auth(USER_ROLE.admin, USER_ROLE.superAdmin, USER_ROLE.mealProvider),
+    auth(USER_ROLE.admin, USER_ROLE.superAdmin, USER_ROLE.provider),
     multerUpload.single('file'),
     (req: Request, res: Response, next: NextFunction) => {
       req.body = JSON.parse(req.body.data);
@@ -24,10 +24,16 @@ router
 
 router.get('/nameId', RecipeControllers.getAllRecipesNameAndId);
 
+router.get(
+  '/my-recipes',
+  auth(USER_ROLE.provider),
+  RecipeControllers.getAllMyRecipes,
+);
+
 router
   .route('/:id')
   .patch(
-    auth(USER_ROLE.admin, USER_ROLE.superAdmin, USER_ROLE.mealProvider),
+    auth(USER_ROLE.admin, USER_ROLE.superAdmin, USER_ROLE.provider),
     multerUpload.single('file'),
     (req: Request, res: Response, next: NextFunction) => {
       req.body = JSON.parse(req.body.data);
@@ -38,7 +44,7 @@ router
   )
   .get(RecipeControllers.getSingleRecipe)
   .delete(
-    auth(USER_ROLE.admin, USER_ROLE.superAdmin, USER_ROLE.mealProvider),
+    auth(USER_ROLE.admin, USER_ROLE.superAdmin, USER_ROLE.provider),
     RecipeControllers.deleteRecipe,
   );
 

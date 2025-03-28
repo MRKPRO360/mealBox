@@ -163,7 +163,7 @@ const createProviderInDB = async (
   userData.email = payload.email;
   userData.method = payload.method;
   userData.phoneNumber = payload.phoneNumber;
-  userData.role = USER_ROLE.mealProvider;
+  userData.role = USER_ROLE.provider;
   userData.name = payload.name;
 
   const session = await mongoose.startSession();
@@ -227,7 +227,7 @@ const getMe = async (userId: string, role: string) => {
   if (role === USER_ROLE.customer) {
     result = await Customer.findOne({ user: userId }).populate('user');
   }
-  if (role === USER_ROLE.mealProvider) {
+  if (role === USER_ROLE.provider) {
     result = await Provider.findOne({ user: userId }).populate('user');
   }
 

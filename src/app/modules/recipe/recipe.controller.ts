@@ -37,6 +37,20 @@ const getAllRecipes = catchAsync(async (req, res) => {
   });
 });
 
+const getAllMyRecipes = catchAsync(async (req, res) => {
+  const result = await RecipeServices.getAllMyRecipesFromDB(
+    req?.query,
+    req.user!,
+  );
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Recipes retrieved successfully',
+    data: result,
+  });
+});
+
 const getAllRecipesNameAndId = catchAsync(async (req, res) => {
   const result = await RecipeServices.getAllRecipesNameAndIdFromDB();
 
@@ -51,7 +65,7 @@ const getAllRecipesNameAndId = catchAsync(async (req, res) => {
 const updateSingleRecipe = catchAsync(async (req, res) => {
   const { id } = req.params;
 
-  const result = await RecipeServices.updateRecipeInDB(id, req?.body);
+  const result = await RecipeServices.updateRecipeInDB(id, req?.body, req.file);
 
   sendResponse(res, {
     statusCode: 200,
@@ -77,6 +91,7 @@ export const RecipeControllers = {
   createRecipe,
   getSingleRecipe,
   getAllRecipes,
+  getAllMyRecipes,
   getAllRecipesNameAndId,
   updateSingleRecipe,
   deleteRecipe,

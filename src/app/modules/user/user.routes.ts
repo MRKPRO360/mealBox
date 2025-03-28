@@ -25,6 +25,7 @@ router.route('/create-provider').post(
   multerUpload.single('file'),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = JSON.parse(req.body.data);
+
     next();
   },
   validateRequest(ProviderValidationsSchema.createProviderValidatonSchema),
@@ -52,7 +53,7 @@ router.get(
   auth(
     USER_ROLE.superAdmin,
     USER_ROLE.admin,
-    USER_ROLE.mealProvider,
+    USER_ROLE.provider,
     USER_ROLE.customer,
   ),
   UserControllers.getMe,

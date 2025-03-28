@@ -74,7 +74,7 @@ const updateProviderInDB = async (payload: Partial<IProvider>, file?: any) => {
 
     const user = await User.findOne({
       email: provider?.email,
-      role: USER_ROLE.mealProvider,
+      role: USER_ROLE.provider,
     }).session(session);
 
     if (!user || !provider) {
@@ -111,7 +111,7 @@ const updateProviderInDB = async (payload: Partial<IProvider>, file?: any) => {
     if (!updatedProvider) throw new AppError(400, 'Provider update failed!');
     const jwtPayload = {
       email: updatedProvider.email,
-      role: USER_ROLE.mealProvider,
+      role: USER_ROLE.provider,
       id: user._id,
       profileImg: updatedProvider.profileImg,
     };

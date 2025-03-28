@@ -12,7 +12,7 @@ router
   .route('/')
   .get(MenuNameControllers.getAllMenuName)
   .post(
-    auth(USER_ROLE.mealProvider, USER_ROLE.admin, USER_ROLE.superAdmin),
+    auth(USER_ROLE.provider, USER_ROLE.admin, USER_ROLE.superAdmin),
     multerUpload.single('file'),
     (req: Request, res: Response, next: NextFunction) => {
       req.body = JSON.parse(req.body.data);
@@ -25,13 +25,13 @@ router
 router
   .route('/:id')
   .delete(
-    auth(USER_ROLE.mealProvider, USER_ROLE.admin, USER_ROLE.superAdmin),
+    auth(USER_ROLE.provider, USER_ROLE.admin, USER_ROLE.superAdmin),
     validateRequest(MenuNameSchemaValidation.updateMenuNameSchemaValidation),
 
     MenuNameControllers.deleteMenuName,
   )
   .patch(
-    auth(USER_ROLE.mealProvider, USER_ROLE.admin, USER_ROLE.superAdmin),
+    auth(USER_ROLE.provider, USER_ROLE.admin, USER_ROLE.superAdmin),
     MenuNameControllers.deleteMenuName,
   );
 

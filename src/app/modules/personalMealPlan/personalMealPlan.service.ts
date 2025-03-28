@@ -39,7 +39,6 @@ const createPersonalMealPlanInDB = async (
     // Calculate the difference in days
     const lastWeek = new Date(latestMealPlan.week);
     const newWeek = new Date(payload.week);
-    console.log({ lastWeek, newWeek });
 
     const diffInDays =
       (newWeek.getTime() - lastWeek.getTime()) / (1000 * 60 * 60 * 24);

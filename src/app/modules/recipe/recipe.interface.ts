@@ -1,4 +1,5 @@
 import { Types } from 'mongoose';
+import { TDifficulties } from './recipe.constant';
 
 export interface IIngredient {
   name: string;
@@ -25,6 +26,7 @@ export interface IInstruction {
 
 export interface IRecipe {
   recipeMenuName: Types.ObjectId;
+  providerId: Types.ObjectId;
   recipeImage: string;
   recipeName: string;
   description: string;
@@ -32,12 +34,27 @@ export interface IRecipe {
   allergens: string[];
   totalTime: string;
   prepTime: string;
-  difficulty: string;
+  difficulty: TDifficulties;
   ingredients: IIngredient[];
   nutritionValues: INutritionValues;
   utensils: string[];
   instructions: IInstruction[];
-  pricePerServing: string;
-  servings: string;
+  portionSizes: {
+    small: {
+      price: string;
+      servings: string;
+    };
+    medium: {
+      price: string;
+      servings: string;
+    };
+    large: {
+      price: string;
+      servings: string;
+    };
+  };
+  inStock: boolean;
+  quantity: string;
+  rating: string;
   isDeleted: boolean;
 }

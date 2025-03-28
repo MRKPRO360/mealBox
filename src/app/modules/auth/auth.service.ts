@@ -39,7 +39,7 @@ const loginUserFromDB = async (payload: ILogin) => {
     profileImg = customer?.profileImg as string;
   }
 
-  if (user.role === USER_ROLE.mealProvider) {
+  if (user.role === USER_ROLE.provider) {
     const provider = await Provider.findOne({ user: user._id });
 
     profileImg = provider?.profileImg as string;
@@ -97,7 +97,7 @@ const refreshTokenFromDB = async (token: string) => {
     profileImg = customer?.profileImg as string;
   }
 
-  if (user.role === USER_ROLE.mealProvider) {
+  if (user.role === USER_ROLE.provider) {
     const provider = await Provider.findOne({ user: user._id });
 
     profileImg = provider?.profileImg as string;

@@ -11,7 +11,7 @@ router
   .route('/')
   .get(MealPlanControllers.getAllMealPlan)
   .post(
-    auth(USER_ROLE.mealProvider, USER_ROLE.admin, USER_ROLE.superAdmin),
+    auth(USER_ROLE.provider, USER_ROLE.admin, USER_ROLE.superAdmin),
     validateRequest(MealPlanValidation.createMealPlanValidationSchema),
     MealPlanControllers.createMealPlan,
   );
@@ -28,12 +28,12 @@ router.get('/recent-plan', MealPlanControllers.getCurrentAndLastMonthMealPlans);
 router
   .route('/:id')
   .delete(
-    auth(USER_ROLE.mealProvider, USER_ROLE.admin, USER_ROLE.superAdmin),
+    auth(USER_ROLE.provider, USER_ROLE.admin, USER_ROLE.superAdmin),
     validateRequest(MealPlanValidation.updateMealPlanValidationSchema),
     MealPlanControllers.deleteMealPlan,
   )
   .patch(
-    auth(USER_ROLE.mealProvider, USER_ROLE.admin, USER_ROLE.superAdmin),
+    auth(USER_ROLE.provider, USER_ROLE.admin, USER_ROLE.superAdmin),
     MealPlanControllers.updateMealPlan,
   );
 

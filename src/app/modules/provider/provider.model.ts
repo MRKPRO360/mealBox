@@ -7,6 +7,7 @@ import {
   IUserName,
 } from '../../interface/user';
 import { User } from '../user/user.model';
+import { CUISINE_SPECIALTIES } from './provider.constant';
 
 const providerNameSchema = new Schema<IUserName>({
   firstName: {
@@ -25,10 +26,10 @@ const providerNameSchema = new Schema<IUserName>({
 });
 
 const providerAddressSchema = new Schema<IUserAddress>({
-  street: { type: String, required: true },
-  city: { type: String, enum: DIVISIONS, required: true },
-  district: { type: String, enum: DISTRICTS, required: true },
-  zipCode: { type: String, required: true },
+  street: { type: String, required: false }, // explicitly set required to false
+  city: { type: String, enum: DIVISIONS, required: false },
+  district: { type: String, enum: DISTRICTS, required: false },
+  zipCode: { type: String, required: false }, // explicitly set required to false
 });
 
 const providerSchema = new Schema<IProvider, ProviderModel>(
@@ -50,6 +51,13 @@ const providerSchema = new Schema<IProvider, ProviderModel>(
       type: providerAddressSchema,
     },
     profileImg: String,
+    cuisineSpecialties: {
+      type: [String],
+      enum: CUISINE_SPECIALTIES,
+      default: ['American', 'Indian'],
+    },
+    customerReviews: [{ rating: String, review: String }],
+    availableMealOptions: [{ type: Schema.Types.ObjectId, ref: 'Recipe' }],
   },
   {
     timestamps: true,

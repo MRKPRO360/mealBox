@@ -12,10 +12,12 @@ router
   .route('/')
   .get(auth(USER_ROLE.admin), ProviderControllers.getAllProviders)
   .patch(
-    auth(USER_ROLE.admin, USER_ROLE.mealProvider),
+    auth(USER_ROLE.admin, USER_ROLE.provider),
     multerUpload.single('file'),
     (req: Request, res: Response, next: NextFunction) => {
       req.body = JSON.parse(req.body.data);
+      console.log(req.body);
+
       next();
     },
     validateRequest(ProviderValidationsSchema.updateProviderValidatonSchema),

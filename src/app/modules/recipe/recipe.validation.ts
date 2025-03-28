@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { DIFFICULTIES } from './recipe.constant';
 
 // Define the Ingredient schema
 const ingredientSchema = z.object({
@@ -8,17 +9,19 @@ const ingredientSchema = z.object({
 });
 
 // Define the NutritionValues schema
-const nutritionValuesSchema = z.object({
-  calories: z.string().min(1, { message: 'Calories are required' }),
-  fat: z.string().min(1, { message: 'Fat is required' }),
-  saturatedFat: z.string().min(1, { message: 'Saturated fat is required' }),
-  carbohydrate: z.string().min(1, { message: 'Carbohydrate is required' }),
-  sugar: z.string().min(1, { message: 'Sugar is required' }),
-  dietaryFiber: z.string().min(1, { message: 'Dietary fiber is required' }),
-  protein: z.string().min(1, { message: 'Protein is required' }),
-  cholesterol: z.string().min(1, { message: 'Cholesterol is required' }),
-  sodium: z.string().min(1, { message: 'Sodium is required' }),
-});
+const nutritionValuesSchema = z
+  .object({
+    calories: z.string().optional(),
+    fat: z.string().optional(),
+    saturatedFat: z.string().optional(),
+    carbohydrate: z.string().optional(),
+    sugar: z.string().optional(),
+    dietaryFiber: z.string().optional(),
+    protein: z.string().optional(),
+    cholesterol: z.string().optional(),
+    sodium: z.string().optional(),
+  })
+  .optional();
 
 // Define the Instruction schema
 const instructionSchema = z.object({
@@ -33,30 +36,6 @@ const updateIngredientSchema = z.object({
     .optional(),
   quantity: z.string().min(1, { message: 'Quantity is required' }).optional(),
   contains: z.array(z.string()).optional(), // Optional field for allergens
-});
-
-const updateNutritionValuesSchema = z.object({
-  calories: z.string().min(1, { message: 'Calories are required' }).optional(),
-  fat: z.string().min(1, { message: 'Fat is required' }).optional(),
-  saturatedFat: z
-    .string()
-    .min(1, { message: 'Saturated fat is required' })
-    .optional(),
-  carbohydrate: z
-    .string()
-    .min(1, { message: 'Carbohydrate is required' })
-    .optional(),
-  sugar: z.string().min(1, { message: 'Sugar is required' }).optional(),
-  dietaryFiber: z
-    .string()
-    .min(1, { message: 'Dietary fiber is required' })
-    .optional(),
-  protein: z.string().min(1, { message: 'Protein is required' }).optional(),
-  cholesterol: z
-    .string()
-    .min(1, { message: 'Cholesterol is required' })
-    .optional(),
-  sodium: z.string().min(1, { message: 'Sodium is required' }).optional(),
 });
 
 const updateInstructionSchema = z.object({
@@ -74,6 +53,7 @@ const createRecipeValidationSchema = z.object({
     recipeMenuName: z
       .string()
       .min(1, { message: 'Recipe menu name is required' }),
+    providerId: z.string().min(1, { message: 'Provider ID is required' }),
     description: z.string().min(1, { message: 'Description is required' }),
     tags: z
       .array(z.string())
@@ -81,7 +61,7 @@ const createRecipeValidationSchema = z.object({
     allergens: z.array(z.string()).default([]),
     totalTime: z.string().min(1, { message: 'Total time is required' }),
     prepTime: z.string().min(1, { message: 'Prep time is required' }),
-    difficulty: z.string().min(1, { message: 'Difficulty is required' }),
+    difficulty: z.enum(DIFFICULTIES),
     ingredients: z
       .array(ingredientSchema)
       .min(1, { message: 'At least one ingredient is required' }),
@@ -92,6 +72,24 @@ const createRecipeValidationSchema = z.object({
     instructions: z
       .array(instructionSchema)
       .min(1, { message: 'At least one instruction is required' }),
+
+    inStock: z.boolean().optional(),
+    quantity: z.string({ required_error: 'Quantity must be provided' }),
+    rating: z.string().optional(),
+    portionSizes: z.object({
+      small: z.object({
+        price: z.string(),
+        servings: z.string(),
+      }),
+      medium: z.object({
+        price: z.string(),
+        servings: z.string(),
+      }),
+      large: z.object({
+        price: z.string(),
+        servings: z.string(),
+      }),
+    }),
   }),
 });
 
@@ -104,6 +102,10 @@ const updateRecipeValidationSchema = z.object({
     recipeMenuName: z
       .string()
       .min(1, { message: 'Recipe menu name is required' })
+      .optional(),
+    providerId: z
+      .string()
+      .min(1, { message: 'Provider ID is required' })
       .optional(),
     description: z
       .string()
@@ -122,15 +124,12 @@ const updateRecipeValidationSchema = z.object({
       .string()
       .min(1, { message: 'Prep time is required' })
       .optional(),
-    difficulty: z
-      .string()
-      .min(1, { message: 'Difficulty is required' })
-      .optional(),
+    difficulty: z.enum(DIFFICULTIES),
     ingredients: z
       .array(updateIngredientSchema)
       .min(1, { message: 'At least one ingredient is required' })
       .optional(),
-    nutritionValues: updateNutritionValuesSchema.optional(),
+    nutritionValues: nutritionValuesSchema.optional(),
     utensils: z
       .array(z.string())
       .min(1, { message: 'At least one utensil is required' })
@@ -139,6 +138,27 @@ const updateRecipeValidationSchema = z.object({
       .array(updateInstructionSchema)
       .min(1, { message: 'At least one instruction is required' })
       .optional(),
+    inStock: z.boolean().optional(),
+    quantity: z
+      .string({ required_error: 'Quantity must be provided' })
+      .optional(),
+    rating: z.string().optional(),
+    portionSizes: z.object({
+      small: z.object({
+        price: z.string().optional(),
+        servings: z.string().optional(),
+      }),
+      medium: z.object({
+        price: z.string().optional(),
+        servings: z.string().optional(),
+      }),
+      large: z
+        .object({
+          price: z.string().optional(),
+          servings: z.string().optional(),
+        })
+        .optional(),
+    }),
   }),
 });
 

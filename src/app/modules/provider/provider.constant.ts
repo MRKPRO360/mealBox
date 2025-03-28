@@ -1,30 +1,13 @@
-// export const CUISINE_SPECIALTIES = [
-//   'Vegan',
-//   'Vegetarian',
-//   'Keto',
-//   'Paleo',
-//   'Gluten-Free',
-//   'Dairy-Free',
-//   'Low-Carb',
-//   'High-Protein',
-//   'Mediterranean',
-//   'Asian',
-//   'Indian',
-//   'Mexican',
-//   'Italian',
-//   'Middle Eastern',
-//   'African',
-//   'American',
-//   'French',
-//   'Japanese',
-//   'Thai',
-//   'Chinese',
-//   'Spanish',
-//   'Halal',
-//   'Kosher',
-//   'Seafood',
-//   'Organic',
-//   'Fusion',
-// ] as const; // `as const` makes the array readonly
-
-// export type TCusineSpecialties = (typeof CUISINE_SPECIALTIES)[number]
+export const CUISINE_SPECIALTIES = [
+  'Italian',
+  'Chinese',
+  'Indian',
+  'Mexican',
+  'Japanese',
+  'French',
+  'Mediterranean',
+  'American',
+  'Vegan',
+  'Thai',
+] as const;
+export type TCusineSpecialties = (typeof CUISINE_SPECIALTIES)[number];
