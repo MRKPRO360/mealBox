@@ -7,6 +7,7 @@ import AuthRouter from '../modules/auth/auth.routes';
 import MenuNameRouter from '../modules/menuName/menuName.routes';
 import MealPlanRouter from '../modules/mealPlan/mealPlan.routes';
 import PersonalMealPlanRouter from '../modules/personalMealPlan/personalMealPlan.routes';
+import OrderRouter from '../modules/order/order.routes';
 
 const router = Router();
 
@@ -42,6 +43,10 @@ const moduleRoutes = [
   {
     path: '/auth',
     route: AuthRouter,
+  },
+  {
+    path: '/orders',
+    route: OrderRouter,
   },
 ];
 

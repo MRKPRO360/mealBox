@@ -17,6 +17,8 @@ export default {
   cloudinary_cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   cloudinary_api_key: process.env.CLOUDINARY_API_KEY,
   cloudinary_api_secret: process.env.CLOUDINARY_API_SECRET,
+  sender_email: process.env.SENDER_EMAIL,
+  sender_app_password: process.env.SENDER_APP_PASSWORD,
   sp: {
     sp_endpoint: process.env.SP_ENDPOINT,
     sp_username: process.env.SP_USERNAME,
@@ -24,4 +26,5 @@ export default {
     sp_prefix: process.env.SP_PREFIX,
     sp_return_url: process.env.SP_RETURN_URL,
   },
+  stripe_sk_test: process.env.STRIPE_SK_TEST,
 };

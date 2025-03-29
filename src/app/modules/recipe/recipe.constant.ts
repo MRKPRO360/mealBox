@@ -14,6 +14,6 @@ export const recipeSearchableFields = [
   'instructions.description',
 ];
 
-export const DIFFICULTIES = ['easy', 'medium', 'hard'] as const;
+export const DIFFICULTIES = ['Easy', 'Medium', 'Hard'] as const;
 
 export type TDifficulties = (typeof DIFFICULTIES)[number];
