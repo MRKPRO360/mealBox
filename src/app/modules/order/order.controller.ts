@@ -30,31 +30,74 @@ const createPaymentIntent = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-// const getOrderDetails = catchAsync(async (req: Request, res: Response) => {
-//   const result = await OrderService.getOrderDetails(req.params.orderId);
+const getAllOrders = catchAsync(async (req: Request, res: Response) => {
+  const result = await OrderService.getAllOrdersFromDB();
 
-//   sendResponse(res, {
-//     statusCode: StatusCodes.OK,
-//     success: true,
-//     message: 'Order retrive succesfully',
-//     data: result,
-//   });
-// });
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Orders retrived succesfully',
+    data: result,
+  });
+});
 
-// const getMyOrders = catchAsync(async (req: Request, res: Response) => {
-//   const result = await OrderService.getMyOrders(
-//     req.query,
-//     req.user as IJwtPayload,
-//   );
+const getOrderDetails = catchAsync(async (req: Request, res: Response) => {
+  const result = await OrderService.getOrderDetailsFromDB(req.params.orderId);
 
-//   sendResponse(res, {
-//     statusCode: StatusCodes.OK,
-//     success: true,
-//     message: 'Order retrive succesfully',
-//     data: result.result,
-//     meta: result.meta,
-//   });
-// });
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Order retrive succesfully',
+    data: result,
+  });
+});
+
+const getMyOrders = catchAsync(async (req: Request, res: Response) => {
+  const result = await OrderService.getMyOrdersFromDB(
+    req.query,
+    req.user as JwtPayload,
+  );
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Order retrive succesfully',
+    data: result.result,
+    meta: result.meta,
+  });
+});
+
+const getProviderOrders = catchAsync(async (req: Request, res: Response) => {
+  const result = await OrderService.getProviderOrdersFromDB(
+    req.user as JwtPayload,
+  );
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Order retrive succesfully',
+    data: result,
+  });
+});
+
+const updateOrderStatusByProvider = catchAsync(
+  async (req: Request, res: Response) => {
+    const { orderId } = req.params;
+    const { status } = req.body;
+    const result = await OrderService.updateOrderStatusByProviderFromDB(
+      orderId,
+      req.user as JwtPayload,
+      status,
+    );
+
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Order status updated succesfully',
+      data: result,
+    });
+  },
+);
 
 // const changeOrderStatus = catchAsync(async (req: Request, res: Response) => {
 //   const { status } = req.body;
@@ -73,10 +116,11 @@ const createPaymentIntent = catchAsync(async (req: Request, res: Response) => {
 // });
 
 export const OrderController = {
-  createOrder,
   createPaymentIntent,
-  //   getMyShopOrders,
-  //   getOrderDetails,
-  //   getMyOrders,
-  //   changeOrderStatus,
+  createOrder,
+  getAllOrders,
+  getOrderDetails,
+  getMyOrders,
+  getProviderOrders,
+  updateOrderStatusByProvider,
 };

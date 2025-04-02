@@ -5,6 +5,7 @@ export interface IOrderMeal {
   meal: Types.ObjectId;
   quantity: number;
   selectedSize: 'small' | 'medium' | 'large';
+  status: 'Pending' | 'Completed' | 'Cancelled';
 }
 export interface IOrder extends Document {
   user: Types.ObjectId;
@@ -15,7 +16,7 @@ export interface IOrder extends Document {
   deliveryCharge: number;
   finalAmount: number;
   paymentMethod: 'Cash' | 'Card' | 'Online';
-  paymentStatus: 'Pending' | 'Paid' | 'Failed';
+  orderStatus: 'Pending' | 'Completed' | 'Cancelled';
   paymentIntentId?: string;
   createdAt?: Date;
   updatedAt?: Date;

@@ -28,6 +28,11 @@ const orderSchema = new Schema<IOrder>(
           enum: ['small', 'medium', 'large'],
           required: true,
         },
+        status: {
+          type: String,
+          enum: ['Pending', 'Completed', 'Cancelled'],
+          default: 'Pending',
+        },
       },
     ],
 
@@ -55,9 +60,9 @@ const orderSchema = new Schema<IOrder>(
       enum: ['COD', 'Online', 'Card'],
       default: 'Online',
     },
-    paymentStatus: {
+    orderStatus: {
       type: String,
-      enum: ['Pending', 'Paid', 'Failed'],
+      enum: ['Pending', 'Completed', 'Canecelled'],
       default: 'Pending',
     },
   },
@@ -93,7 +98,7 @@ orderSchema.pre('validate', async function (next) {
   }
 
   const isDhaka = this?.shippingAddress?.toLowerCase()?.includes('dhaka');
-  const deliveryCharge = isDhaka ? 60 : 120;
+  const deliveryCharge = isDhaka ? 5 : 10;
 
   this.totalAmount = totalAmount;
 

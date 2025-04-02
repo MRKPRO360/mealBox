@@ -100,7 +100,7 @@ const createAdminInDB = async (
   session.startTransaction();
 
   try {
-    payload.profileImg = file.path || '';
+    payload.profileImg = payload.profileImg || file?.path || '';
 
     // CREATING USER
     const newUser = await User.create([userData], { session });
@@ -170,7 +170,7 @@ const createProviderInDB = async (
   session.startTransaction();
 
   try {
-    payload.profileImg = file.path || '';
+    payload.profileImg = payload.profileImg || file?.path || '';
 
     // CREATING USER
     const newUser = await User.create([userData], { session });

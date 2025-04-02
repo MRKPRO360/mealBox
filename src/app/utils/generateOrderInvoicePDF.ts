@@ -1,6 +1,9 @@
+/* eslint-disable no-async-promise-executor */
 import PDFDocument from 'pdfkit';
 import { IOrder } from '../modules/order/order.interface';
 import axios from 'axios';
+import { IUser } from '../modules/user/user.interface';
+import { IRecipe } from '../modules/recipe/recipe.interface';
 
 /**
  * Generates a PDF invoice for an order.
@@ -12,8 +15,7 @@ export const generateOrderInvoicePDF = async (
 ): Promise<Buffer> => {
   return new Promise<Buffer>(async (resolve, reject) => {
     try {
-      const logoUrl =
-        'https://res.cloudinary.com/dbgrq28js/image/upload/v1736763971/logoipsum-282_ilqjfb_paw4if.png';
+      const logoUrl = 'https://i.ibb.co.com/8LLM80XT/feastify.png';
       // Download the logo image as a buffer
       const response = await axios.get(logoUrl, {
         responseType: 'arraybuffer',
@@ -37,11 +39,13 @@ export const generateOrderInvoicePDF = async (
         .fontSize(20)
         .font('Helvetica-Bold')
         .fillColor('#000000')
-        .text('NextMert', { align: 'center' });
+        .text('Feastify', { align: 'center' });
       doc
         .fontSize(10)
-        .text('Level-4, 34, Awal Centre, Banani, Dhaka', { align: 'center' });
-      doc.fontSize(10).text('Email: support@nextmert.com', { align: 'center' });
+        .text('Level-4, 34, Feni, Parashuram(Kawsar Tower)', {
+          align: 'center',
+        });
+      doc.fontSize(10).text('Email: support@feastify.com', { align: 'center' });
       doc.fontSize(10).text('Phone: + 06 223 456 678', { align: 'center' });
       doc.moveDown(0.5);
       doc
@@ -57,7 +61,9 @@ export const generateOrderInvoicePDF = async (
       doc.text(`Order Date: ${(order.createdAt as Date).toLocaleDateString()}`);
       doc.moveDown(0.5);
 
-      doc.text(`Customer Name: ${order.user.name}`);
+      doc.text(
+        `Customer Name: ${(order.user as unknown as IUser).name.firstName}`,
+      );
       doc.text(`Shipping Address: ${order.shippingAddress}`);
       doc.moveDown(1);
 
@@ -102,10 +108,11 @@ export const generateOrderInvoicePDF = async (
 
       // Order Products (Normal text, not bold)
       order.meals.forEach((item) => {
-        const productName = item.meal?.name || 'Unknown Product';
+        const productName =
+          (item.meal as unknown as IRecipe)?.recipeName || 'Unknown Product';
         const quantity = item.quantity;
 
-        const price = item.unitPrice * quantity || 0;
+        const price = item.quantity * quantity || 0;
 
         doc
           .fontSize(11)
@@ -159,10 +166,7 @@ export const generateOrderInvoicePDF = async (
         .fontSize(11)
         .fillColor('#000000')
         .text('Discount', 50, pricingY, { width: 200 });
-      doc.text(`-${order.discount.toFixed(2)} /-`, 400, pricingY, {
-        width: 90,
-        align: 'right',
-      });
+
       pricingY += tableHeight;
 
       doc

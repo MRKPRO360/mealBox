@@ -2,14 +2,18 @@ import mongoose from 'mongoose';
 import { IOrder } from './order.interface';
 import { Order } from './order.model';
 import { Payment } from '../payment/payment.model';
-import { generateOrderInvoicePDF } from '../../utils/generateOrderInvoicePDF';
+// import { generateOrderInvoicePDF } from '../../utils/generateOrderInvoicePDF';
+// import { EmailHelper } from '../../utils/EmailHelpert';
 import Recipe from '../recipe/recipe.model';
 import { JwtPayload } from 'jsonwebtoken';
-import { EmailHelper } from '../../utils/EmailHelpert';
 
 import Stripe from 'stripe';
 import config from '../../config';
 import AppError from '../../errors/AppError';
+import QueryBuilder from '../../builder/QueryBuilder';
+import { IRecipe } from '../recipe/recipe.interface';
+import { User } from '../user/user.model';
+import Provider from '../provider/provider.model';
 
 const stripe = new Stripe(config.stripe_sk_test as string);
 
@@ -76,27 +80,29 @@ const createOrder = async (
     await session.commitTransaction();
     session.endSession();
 
-    /*
-    const pdfBuffer = await generateOrderInvoicePDF(createdOrder);
-    const emailContent = await EmailHelper.createEmailContent(
-      { userName: createdOrder.user.firstName || '' },
-      'orderInvoice',
-    );
+    // const pdfBuffer = await generateOrderInvoicePDF(createdOrder);
 
-    const attachment = {
-      filename: `Invoice_${createdOrder._id}.pdf`,
-      content: pdfBuffer,
-      encoding: 'base64', // if necessary
-    };
+    // const emailContent = await EmailHelper.createEmailContent(
+    //   {
+    //     userName: (createdOrder.user as unknown as IUser).name.firstName || '',
+    //   },
+    //   'orderInvoice',
+    // );
 
-    await EmailHelper.sendEmail(
-      createdOrder.user.email,
-      emailContent,
-      'Order confirmed!',
-      attachment,
-    );
+    // const attachment = {
+    //   filename: `Invoice_${createdOrder._id}.pdf`,
+    //   content: pdfBuffer,
+    //   encoding: 'base64', // if necessary
+    // };
 
-    */
+    // if (emailContent) {
+    //   await EmailHelper.sendEmail(
+    //     (createdOrder.user as unknown as IUser).email,
+    //     emailContent,
+    //     'Order confirmed!',
+    //     attachment,
+    //   );
+    // }
 
     return result;
   } catch (error) {
@@ -122,107 +128,73 @@ const createPaymentIntent = async (price: string) => {
   return paymentIntent.client_secret;
 };
 
-// app.post("/payments", async (req, res) => {
-//   const payment = req.body;
-//   const result = await paymentsCollection.insertOne(payment);
+const getAllOrdersFromDB = async () => {
+  return await Order.find({});
+};
 
-//   const id = payment.propertyId;
-//   const filter = { _id: new ObjectId(id) };
+const getProviderOrdersFromDB = async (authUser: JwtPayload) => {
+  const orders = await Order.find({}).populate({
+    path: 'meals.meal',
+    select: 'providerId recipeName',
+  });
 
-//   const updatedDoc = {
-//     $set: {
-//       paid: true,
-//       transactionId: payment.transactionId,
-//     },
-//   };
+  const provider = await Provider.findOne({
+    user: authUser.id,
+  }).select('_id');
 
-//   await propertyCollection.updateOne(filter, updatedDoc);
+  if (!provider) throw new AppError(400, 'No provider found!');
 
-//   res.send(result);
-// });
+  const filteredOrders = orders
+    .map((order) => {
+      const mealsForProvider = order.meals.filter((meal) => {
+        return (
+          (meal.meal as unknown as IRecipe).providerId.toString() ===
+          provider._id.toString()
+        );
+      });
 
-// const getMyRecipeOrders = async (
-//   query: Record<string, unknown>,
-//   authUser: JwtPayload,
-// ) => {
-//   const userHasShop = await User.findById(authUser.userId).select(
-//     'isActive hasShop',
-//   );
+      return mealsForProvider.length > 0
+        ? { ...order.toObject(), meals: mealsForProvider }
+        : null;
+    })
+    .filter((order) => order !== null); // Remove orders with no meals from this provider
 
-//   if (!userHasShop)
-//     throw new AppError(404, 'User not found!');
-//   if (!userHasShop.isActive)
-//     throw new AppError(400, 'User account is not active!');
-//   if (!userHasShop.hasShop)
-//     throw new AppError(400, 'User does not have any shop!');
+  return filteredOrders;
+};
 
-//   const shopIsActive = await Shop.findOne({
-//     user: userHasShop._id,
-//     isActive: true,
-//   }).select('isActive');
+const getOrderDetailsFromDB = async (orderId: string) => {
+  const order = await Order.findById(orderId).populate('user meals.meal');
+  if (!order) {
+    throw new AppError(404, 'Order not Found');
+  }
 
-//   if (!shopIsActive)
-//     throw new AppError(400, 'Shop is not active!');
+  order.payment = await Payment.findOne({ order: order._id });
+  return order;
+};
 
-//   const orderQuery = new QueryBuilder(
-//     Order.find({ shop: shopIsActive._id }).populate(
-//       'user products.product coupon',
-//     ),
-//     query,
-//   )
-//     .search(['user.name', 'user.email', 'products.product.name'])
-//     .filter()
-//     .sort()
-//     .paginate()
-//     .fields();
+const getMyOrdersFromDB = async (
+  query: Record<string, unknown>,
+  authUser: JwtPayload,
+) => {
+  const orderQuery = new QueryBuilder(
+    Order.find({ user: authUser.userId }).populate('user meals.meal'),
+    query,
+  )
+    .search(['user.name', 'user.email', 'meals.meal.recipeName'])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
 
-//   const result = await orderQuery.modelQuery;
+  const result = await orderQuery.modelQuery;
 
-//   const meta = await orderQuery.countTotal();
+  const meta = await orderQuery.countTotal();
 
-//   return {
-//     meta,
-//     result,
-//   };
-// };
-
-// const getOrderDetails = async (orderId: string) => {
-//   const order = await Order.findById(orderId).populate(
-//     'user products.product coupon',
-//   );
-//   if (!order) {
-//     throw new AppError(404, 'Order not Found');
-//   }
-
-//   order.payment = await Payment.findOne({ order: order._id });
-//   return order;
-// };
-
-// const getMyOrders = async (
-//   query: Record<string, unknown>,
-//   authUser: JwtPayload,
-// ) => {
-//   const orderQuery = new QueryBuilder(
-//     Order.find({ user: authUser.userId }).populate(
-//       'user products.product coupon',
-//     ),
-//     query,
-//   )
-//     .search(['user.name', 'user.email', 'products.product.name'])
-//     .filter()
-//     .sort()
-//     .paginate()
-//     .fields();
-
-//   const result = await orderQuery.modelQuery;
-
-//   const meta = await orderQuery.countTotal();
-
-//   return {
-//     meta,
-//     result,
-//   };
-// };
+  return {
+    meta,
+    result,
+  };
+};
 
 // const changeOrderStatus = async (
 //   orderId: string,
@@ -256,11 +228,53 @@ const createPaymentIntent = async (price: string) => {
 //   return order;
 // };
 
+const updateOrderStatusByProviderFromDB = async (
+  orderId: string,
+  authUser: JwtPayload,
+  newStatus: string,
+) => {
+  const provider = await Provider.findOne({
+    user: authUser.id,
+  }).select('_id');
+
+  if (!provider) throw new AppError(400, 'No provider found!');
+
+  const order = await Order.findById(orderId).populate('meals.meal');
+
+  if (!order) {
+    throw new Error('Order not found');
+  }
+
+  // Update only the meals from the specified provider
+  order.meals.forEach((meal) => {
+    if (
+      (meal.meal as unknown as IRecipe).providerId.toString() ===
+      provider._id.toString()
+    ) {
+      meal.status = newStatus as 'Pending' | 'Completed' | 'Cancelled';
+    }
+  });
+
+  const allStatuses = order.meals.map((meal) => meal.status);
+  if (allStatuses.every((status) => status === 'Completed')) {
+    order.orderStatus = 'Completed';
+  } else if (allStatuses.every((status) => status === 'Cancelled')) {
+    order.orderStatus = 'Cancelled';
+  } else {
+    order.orderStatus = 'Pending';
+  }
+
+  return await order.save();
+};
+
 export const OrderService = {
   createOrder,
   createPaymentIntent,
+  getMyOrdersFromDB,
+  getProviderOrdersFromDB,
+  getOrderDetailsFromDB,
+  getAllOrdersFromDB,
+  updateOrderStatusByProviderFromDB,
   //   getMyShopOrders,
-  //   getOrderDetails,
-  //   getMyOrders,
   //   changeOrderStatus,
 };
