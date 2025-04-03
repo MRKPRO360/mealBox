@@ -62,8 +62,7 @@ const getMyOrders = catchAsync(async (req: Request, res: Response) => {
     statusCode: 200,
     success: true,
     message: 'Order retrive succesfully',
-    data: result.result,
-    meta: result.meta,
+    data: result,
   });
 });
 

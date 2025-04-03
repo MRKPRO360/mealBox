@@ -12,7 +12,6 @@ import config from '../../config';
 import AppError from '../../errors/AppError';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { IRecipe } from '../recipe/recipe.interface';
-import { User } from '../user/user.model';
 import Provider from '../provider/provider.model';
 
 const stripe = new Stripe(config.stripe_sk_test as string);
@@ -177,7 +176,7 @@ const getMyOrdersFromDB = async (
   authUser: JwtPayload,
 ) => {
   const orderQuery = new QueryBuilder(
-    Order.find({ user: authUser.userId }).populate('user meals.meal'),
+    Order.find({ user: authUser.id }).populate('user meals.meal'),
     query,
   )
     .search(['user.name', 'user.email', 'meals.meal.recipeName'])

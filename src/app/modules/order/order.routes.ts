@@ -6,8 +6,6 @@ import { USER_ROLE } from '../user/user.constant';
 
 const router = Router();
 
-// router.post('/', auth(USER_ROLE.customer), OrderController.createOrder);
-
 router
   .route('/')
   .post(auth(USER_ROLE.customer), OrderController.createOrder)
@@ -23,6 +21,7 @@ router.get(
   auth(USER_ROLE.provider),
   OrderController.getProviderOrders,
 );
+router.get('/my-orders', auth(USER_ROLE.customer), OrderController.getMyOrders);
 
 router
   .route('/:orderId')
@@ -31,11 +30,5 @@ router
     OrderController.getOrderDetails,
   )
   .patch(auth(USER_ROLE.provider), OrderController.updateOrderStatusByProvider);
-
-// router.patch(
-//     '/:orderId/status',
-//     auth(UserRole.USER),
-//     OrderController.changeOrderStatus
-// )
 
 export default router;
