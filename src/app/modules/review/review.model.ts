@@ -36,7 +36,6 @@ reviewSchema.statics.calcAvgRatings = async function (
       },
     },
   ]);
-  console.log('STATS', stats);
 
   const rating = stats[0]?.avgRating?.toFixed(1) || '3';
   const count = stats[0]?.nRating || 0;
