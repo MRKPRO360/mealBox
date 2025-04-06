@@ -22,13 +22,41 @@ const createRecipeInDB = async (file: any, payload: IRecipe) => {
 
 // GETTING A RECIPE
 const getSingleRecipeFromDB = async (id: string) => {
-  return await Recipe.findById(id).populate('recipeMenuName').lean();
+  return await Recipe.findById(id)
+    .populate('recipeMenuName')
+    .populate({
+      path: 'reviews',
+      select: 'rating comment userId createdAt',
+      populate: {
+        path: 'userId',
+        select: 'name email',
+        populate: {
+          path: 'customer',
+          select: 'profileImg',
+        },
+      },
+    })
+    .lean();
 };
 
 // GETTING ALL RECIPES
 const getAllRecipesFromDB = async (query: Record<string, unknown>) => {
   const recipeQuery = new QueryBuilder(
-    Recipe.find().populate('recipeMenuName').lean(),
+    Recipe.find()
+      .populate('recipeMenuName')
+      .populate({
+        path: 'reviews',
+        select: 'rating comment userId createdAt',
+        populate: {
+          path: 'userId',
+          select: 'name email',
+          populate: {
+            path: 'customer',
+            select: 'profileImg',
+          },
+        },
+      })
+      .lean(),
     query,
   )
     .search(recipeSearchableFields)

@@ -108,4 +108,20 @@ userSchema.statics.isJWTIssuedBeforePasswordChanged = function (
   return passwordChangedTime > jwtIssuedTimestamp;
 };
 
+// VIRTUAL
+
+userSchema.virtual('customer', {
+  ref: 'Customer',
+  localField: '_id',
+  foreignField: 'user',
+  justOne: true,
+});
+
+userSchema.virtual('provider', {
+  ref: 'Customer',
+  localField: '_id',
+  foreignField: 'user',
+  justOne: true,
+});
+
 export const User = model<IUser, UserModel>('User', userSchema);

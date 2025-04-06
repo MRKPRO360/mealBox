@@ -46,6 +46,8 @@ const createProviderValidatonSchema = z.object({
       )
       .optional(),
   }),
+  rating: z.string().optional(),
+  ratingsCount: z.string().optional(),
 });
 
 const updateProviderValidatonSchema = z.object({
@@ -75,6 +77,8 @@ const updateProviderValidatonSchema = z.object({
       .optional(),
     availableMealOptions: z.array(z.string()).optional(),
     orderHistory: z.array(z.string()).optional(),
+    rating: z.string().optional(),
+    ratingsCount: z.string().optional(),
   }),
 });
 

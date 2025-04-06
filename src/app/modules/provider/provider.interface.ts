@@ -19,6 +19,8 @@ export interface IProvider extends Document {
   customerReviews?: { rating: string; comment: string }[];
   cuisineSpecialties: TCusineSpecialties[];
   availableMealOptions: Types.ObjectId;
+  rating: string;
+  ratingsCount: string;
 }
 
 export interface ProviderModel extends Model<IProvider> {

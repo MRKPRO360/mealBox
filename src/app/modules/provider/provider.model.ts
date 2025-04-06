@@ -58,10 +58,15 @@ const providerSchema = new Schema<IProvider, ProviderModel>(
     },
     customerReviews: [{ rating: String, review: String }],
     availableMealOptions: [{ type: Schema.Types.ObjectId, ref: 'Recipe' }],
+    rating: { type: String, default: '3' }, // Range: 1-5 stars.
+    ratingsCount: { type: String, default: '0' },
   },
   {
     timestamps: true,
     toJSON: {
+      virtuals: true,
+    },
+    toObject: {
       virtuals: true,
     },
   },
@@ -87,6 +92,19 @@ providerSchema.pre('findOne', function (next) {
 providerSchema.statics.isproviderExistsById = async function (id: string) {
   return await User.findById(id);
 };
+
+// VIRTUAL POPULATE
+
+providerSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'targetId',
+  localField: '_id',
+  options: {
+    match: {
+      targetType: 'provider',
+    },
+  },
+});
 
 const Provider = mongoose.model<IProvider, ProviderModel>(
   'provider',

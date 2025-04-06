@@ -54,6 +54,7 @@ const recipeSchema = new Schema<IRecipe>(
     inStock: { type: Boolean, default: true },
     quantity: { type: String, required: true },
     rating: { type: String, default: '3' }, // Range: 1-5 stars.
+    ratingsCount: { type: String, default: '0' },
     portionSizes: {
       small: {
         price: String,
@@ -65,6 +66,12 @@ const recipeSchema = new Schema<IRecipe>(
   },
   {
     timestamps: true,
+    toJSON: {
+      virtuals: true,
+    },
+    toObject: {
+      virtuals: true,
+    },
   },
 );
 
@@ -86,6 +93,14 @@ recipeSchema.pre('find', function (next) {
 recipeSchema.pre('findOne', function (next) {
   this.where('isDeleted', false);
   next();
+});
+
+// virtual populating
+recipeSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'targetId',
+  localField: '_id',
+  options: { match: { targetType: 'recipe' } },
 });
 
 const Recipe = model<IRecipe>('Recipe', recipeSchema);

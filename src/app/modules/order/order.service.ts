@@ -134,7 +134,7 @@ const getAllOrdersFromDB = async () => {
 const getProviderOrdersFromDB = async (authUser: JwtPayload) => {
   const orders = await Order.find({}).populate({
     path: 'meals.meal',
-    select: 'providerId recipeName',
+    // select: 'providerId recipeName recipoe',
   });
 
   const provider = await Provider.findOne({
@@ -241,7 +241,7 @@ const updateOrderStatusByProviderFromDB = async (
   const order = await Order.findById(orderId).populate('meals.meal');
 
   if (!order) {
-    throw new Error('Order not found');
+    throw new AppError(400, 'Order not found');
   }
 
   // Update only the meals from the specified provider

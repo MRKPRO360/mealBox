@@ -10,11 +10,33 @@ import createToken from '../auth/auth.utils';
 import config from '../../config';
 
 const getAllProvidersFromDB = async () => {
-  return await Provider.find({});
+  return await Provider.find({}).populate({
+    path: 'reviews',
+    select: 'rating comment userId createdAt',
+    populate: {
+      path: 'userId',
+      select: 'name email',
+      populate: {
+        path: 'customer',
+        select: 'profileImg',
+      },
+    },
+  });
 };
 
 const getSingleProviderFromDB = async (id: string) => {
-  return await Provider.findById(id);
+  return await Provider.findById(id).populate({
+    path: 'reviews',
+    select: 'rating comment userId createdAt',
+    populate: {
+      path: 'userId',
+      select: 'name email',
+      populate: {
+        path: 'customer',
+        select: 'profileImg',
+      },
+    },
+  });
 };
 
 const deleteProviderFromDB = async (id: string) => {

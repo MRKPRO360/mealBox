@@ -76,6 +76,7 @@ const createRecipeValidationSchema = z.object({
     inStock: z.boolean().optional(),
     quantity: z.string({ required_error: 'Quantity must be provided' }),
     rating: z.string().optional(),
+    ratingsCount: z.string().optional(),
     portionSizes: z.object({
       small: z.object({
         price: z.string(),
@@ -143,6 +144,7 @@ const updateRecipeValidationSchema = z.object({
       .string({ required_error: 'Quantity must be provided' })
       .optional(),
     rating: z.string().optional(),
+    ratingsCount: z.string().optional(),
     portionSizes: z.object({
       small: z.object({
         price: z.string().optional(),

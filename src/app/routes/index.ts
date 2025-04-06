@@ -8,6 +8,7 @@ import MenuNameRouter from '../modules/menuName/menuName.routes';
 import MealPlanRouter from '../modules/mealPlan/mealPlan.routes';
 import PersonalMealPlanRouter from '../modules/personalMealPlan/personalMealPlan.routes';
 import OrderRouter from '../modules/order/order.routes';
+import ReviewRouter from '../modules/review/review.routes';
 
 const router = Router();
 
@@ -47,6 +48,10 @@ const moduleRoutes = [
   {
     path: '/orders',
     route: OrderRouter,
+  },
+  {
+    path: '/reviews',
+    route: ReviewRouter,
   },
 ];
 
