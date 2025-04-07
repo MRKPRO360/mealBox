@@ -8,6 +8,10 @@ import { ReviewControllers } from './review.controller';
 const router = express.Router();
 
 router
+  .route('/elegibility')
+  .get(auth(USER_ROLE.customer), ReviewControllers.checkReviewEleigibility);
+
+router
   .route('/')
   .post(
     auth(USER_ROLE.customer),

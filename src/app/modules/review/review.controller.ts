@@ -3,6 +3,24 @@ import { ReviewServices } from './review.service';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 
+const checkReviewEleigibility = catchAsync(
+  async (req: Request, res: Response) => {
+    const { id } = req.user!;
+
+    const result = await ReviewServices.checkReviewEleigibilityFromDB({
+      userId: id,
+      ...req.body,
+    });
+
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Elegibility checked!',
+      data: result,
+    });
+  },
+);
+
 const createReview = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.user!;
 
@@ -68,6 +86,7 @@ const deleteSingleReview = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const ReviewControllers = {
+  checkReviewEleigibility,
   createReview,
   getAllRecipeReviews,
   getAllProviderReviews,
