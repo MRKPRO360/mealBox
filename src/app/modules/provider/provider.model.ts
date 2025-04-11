@@ -46,7 +46,7 @@ const providerSchema = new Schema<IProvider, ProviderModel>(
       unique: true,
       ref: 'User',
     },
-    orderHistory: [{ type: Schema.Types.ObjectId, ref: 'Order' }],
+
     address: {
       type: providerAddressSchema,
     },
@@ -56,10 +56,10 @@ const providerSchema = new Schema<IProvider, ProviderModel>(
       enum: CUISINE_SPECIALTIES,
       default: ['American', 'Indian'],
     },
-    customerReviews: [{ rating: String, review: String }],
+
     availableMealOptions: [{ type: Schema.Types.ObjectId, ref: 'Recipe' }],
-    rating: { type: String, default: '3' }, // Range: 1-5 stars.
-    ratingsCount: { type: String, default: '0' },
+    rating: { type: Number, default: 3 }, // Range: 1-5 stars.
+    ratingsCount: { type: Number, default: 0 },
   },
   {
     timestamps: true,
@@ -74,11 +74,11 @@ const providerSchema = new Schema<IProvider, ProviderModel>(
 
 //virtual
 providerSchema.virtual('fullName').get(function () {
-  return this?.name?.firstName + this?.name?.lastName;
+  return this?.name?.firstName + ' ' + this?.name?.lastName;
 });
 
 // Query Middleware
-providerSchema.pre('find', function (next) {
+providerSchema.pre('find', async function (next) {
   this.find({ isDeleted: { $ne: true } });
   next();
 });

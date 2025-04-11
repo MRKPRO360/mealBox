@@ -1,3 +1,9 @@
+export const providerSearchableFields = [
+  'name.firstName',
+  'name.lastName',
+  'cuisineSpecialties',
+];
+
 export const CUISINE_SPECIALTIES = [
   'Italian',
   'Chinese',

@@ -2,8 +2,20 @@ import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import { ProviderServices } from './provider.service';
 
+const getAllCuisineSpecialties = catchAsync(async (req, res) => {
+  const cuisineSpecialties =
+    await ProviderServices.getAllCuisineSpecialtiesFromDB();
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Cusine specialties retrieved successfully',
+    data: cuisineSpecialties,
+  });
+});
+
 const getAllProviders = catchAsync(async (req, res) => {
-  const provider = await ProviderServices.getAllProvidersFromDB();
+  const provider = await ProviderServices.getAllProvidersFromDB(req?.query);
 
   sendResponse(res, {
     statusCode: 200,
@@ -49,6 +61,7 @@ const deleteProvider = catchAsync(async (req, res) => {
 });
 
 export const ProviderControllers = {
+  getAllCuisineSpecialties,
   getAllProviders,
   getSingleProvider,
   updateProvider,

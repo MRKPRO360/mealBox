@@ -68,7 +68,7 @@ const updateReview = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: 'All providers review retrieved successfully',
+    message: 'Review updated successfully!',
     data: result,
   });
 });
@@ -80,7 +80,7 @@ const deleteSingleReview = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: 'Review deleted successfully',
+    message: 'Review deleted successfully!',
     data: result,
   });
 });

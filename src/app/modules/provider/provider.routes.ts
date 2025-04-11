@@ -10,7 +10,7 @@ const router = express.Router();
 
 router
   .route('/')
-  .get(auth(USER_ROLE.admin), ProviderControllers.getAllProviders)
+  .get(ProviderControllers.getAllProviders)
   .patch(
     auth(USER_ROLE.admin, USER_ROLE.provider),
     multerUpload.single('file'),
@@ -24,9 +24,14 @@ router
     ProviderControllers.updateProvider,
   );
 
+router.get(
+  '/cuisine-specialties',
+  ProviderControllers.getAllCuisineSpecialties,
+);
+
 router
   .route('/:id')
-  .get(auth(USER_ROLE.admin), ProviderControllers.getSingleProvider)
+  .get(ProviderControllers.getSingleProvider)
   .delete(auth(USER_ROLE.admin), ProviderControllers.deleteProvider);
 
 export default router;

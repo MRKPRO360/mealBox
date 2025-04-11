@@ -2,6 +2,7 @@ import { Model, Types } from 'mongoose';
 import { USER_ROLE } from '../user/user.constant';
 import { IUserAddress, IUserName } from '../../interface/user';
 import { TCusineSpecialties } from './provider.constant';
+import { IReview } from '../review/review.interface';
 
 export interface IProvider extends Document {
   _id: Types.ObjectId;
@@ -15,12 +16,13 @@ export interface IProvider extends Document {
   address: IUserAddress;
   profileImg: string;
   experience?: string; // e.g., "5 years in food industry"
-  orderHistory?: Types.ObjectId[];
-  customerReviews?: { rating: string; comment: string }[];
   cuisineSpecialties: TCusineSpecialties[];
   availableMealOptions: Types.ObjectId;
-  rating: string;
-  ratingsCount: string;
+  rating: number;
+  ratingsCount: number;
+  createdAt: number;
+  updatedAt: number;
+  reviews: IReview[];
 }
 
 export interface ProviderModel extends Model<IProvider> {

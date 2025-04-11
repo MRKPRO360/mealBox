@@ -13,6 +13,7 @@ const checkReviewEleigibilityFromDB = async (payload: {
   userId: Types.ObjectId;
 }) => {
   const customer = await Customer.findOne({ user: payload.userId });
+  console.log(payload);
 
   if (!customer)
     throw new AppError(403, 'Only customers can leave a recipe review!');
@@ -26,6 +27,7 @@ const checkReviewEleigibilityFromDB = async (payload: {
     targetId: payload.targetId,
     targetType: payload.targetType,
   });
+
   alreadyReviewed = !!existing;
 
   // PURCHASE CHECK
@@ -56,6 +58,9 @@ const checkReviewEleigibilityFromDB = async (payload: {
         403,
         'You can only review a provider you have ordered from.',
       );
+    else {
+      eligible = true;
+    }
   }
 
   return {

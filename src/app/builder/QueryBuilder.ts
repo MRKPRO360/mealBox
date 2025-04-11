@@ -57,9 +57,15 @@ class QueryBuilder<T> {
   }
 
   sort() {
-    const sort =
-      (this?.query?.sort as string)?.split(',')?.join(' ') || '-createdAt';
-    this.modelQuery = this.modelQuery.sort(sort as string);
+    const sortBy = this.query?.sort as string;
+    const order = (this.query?.order as string)?.toLowerCase();
+
+    if (sortBy) {
+      const sortOrder = order === 'desc' ? '-' : '';
+      this.modelQuery = this.modelQuery.sort(`${sortOrder}${sortBy}`);
+    } else {
+      this.modelQuery = this.modelQuery.sort('-createdAt');
+    }
 
     return this;
   }

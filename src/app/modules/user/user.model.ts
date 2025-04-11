@@ -109,15 +109,14 @@ userSchema.statics.isJWTIssuedBeforePasswordChanged = function (
 };
 
 // VIRTUAL
+// userSchema.virtual('provider', {
+//   ref: 'Customer',
+//   localField: '_id',
+//   foreignField: 'user',
+//   justOne: true,
+// });
 
 userSchema.virtual('customer', {
-  ref: 'Customer',
-  localField: '_id',
-  foreignField: 'user',
-  justOne: true,
-});
-
-userSchema.virtual('provider', {
   ref: 'Customer',
   localField: '_id',
   foreignField: 'user',

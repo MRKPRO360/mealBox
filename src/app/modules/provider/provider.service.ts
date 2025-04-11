@@ -8,35 +8,59 @@ import { IProvider } from './provider.interface';
 import { USER_ROLE } from '../user/user.constant';
 import createToken from '../auth/auth.utils';
 import config from '../../config';
+import QueryBuilder from '../../builder/QueryBuilder';
+import {
+  CUISINE_SPECIALTIES,
+  providerSearchableFields,
+} from './provider.constant';
 
-const getAllProvidersFromDB = async () => {
-  return await Provider.find({}).populate({
-    path: 'reviews',
-    select: 'rating comment userId createdAt',
-    populate: {
-      path: 'userId',
-      select: 'name email',
-      populate: {
-        path: 'customer',
-        select: 'profileImg',
-      },
-    },
-  });
+const getAllProvidersFromDB = async (query: Record<string, unknown>) => {
+  const providerQuery = new QueryBuilder(
+    Provider.find()
+      .populate({
+        path: 'reviews',
+        select: 'rating comment userId createdAt',
+        populate: {
+          path: 'userId',
+          select: 'name email',
+          populate: {
+            path: 'customer',
+            select: 'profileImg',
+          },
+        },
+      })
+      .lean() as any,
+    query,
+  )
+    .search(providerSearchableFields)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+  const meta = await providerQuery.countTotal();
+  const result = await providerQuery.modelQuery;
+
+  return {
+    meta,
+    result,
+  };
 };
 
 const getSingleProviderFromDB = async (id: string) => {
-  return await Provider.findById(id).populate({
-    path: 'reviews',
-    select: 'rating comment userId createdAt',
-    populate: {
-      path: 'userId',
-      select: 'name email',
+  return await Provider.findById(id)
+    .populate({
+      path: 'reviews',
+      select: 'rating comment userId createdAt',
       populate: {
-        path: 'customer',
-        select: 'profileImg',
+        path: 'userId',
+        select: 'name email',
+        populate: {
+          path: 'customer',
+          select: 'profileImg',
+        },
       },
-    },
-  });
+    })
+    .lean();
 };
 
 const deleteProviderFromDB = async (id: string) => {
@@ -162,7 +186,12 @@ const updateProviderInDB = async (payload: Partial<IProvider>, file?: any) => {
   }
 };
 
+const getAllCuisineSpecialtiesFromDB = async () => {
+  return [...CUISINE_SPECIALTIES];
+};
+
 export const ProviderServices = {
+  getAllCuisineSpecialtiesFromDB,
   getAllProvidersFromDB,
   getSingleProviderFromDB,
   updateProviderInDB,
