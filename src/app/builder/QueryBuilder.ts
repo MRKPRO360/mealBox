@@ -27,6 +27,10 @@ class QueryBuilder<T> {
 
   filter() {
     const queryObj = { ...this.query };
+    // Filtering
+    const excludeFields = ['searchTerm', 'sort', 'limit', 'page', 'fields'];
+
+    excludeFields.forEach((el) => delete queryObj[el]);
 
     const inStockValue = queryObj.inStock;
     if (typeof inStockValue === 'string') {
@@ -39,19 +43,34 @@ class QueryBuilder<T> {
       }
     }
 
-    // Filtering
-    const excludeFields = ['searchTerm', 'sort', 'limit', 'page', 'fields'];
+    // Custom rating filter
+    if (queryObj.rating) {
+      const min = parseFloat(
+        Array.isArray(queryObj.rating)
+          ? queryObj.rating[0]
+          : queryObj.rating || '0',
+      );
 
-    excludeFields.forEach((el) => delete queryObj[el]);
+      queryObj.rating = { $gte: min, $lt: min + 1 };
 
-    let queryStr = JSON.stringify(queryObj);
+      this.modelQuery = this.modelQuery.find({
+        ...queryObj,
+        rating: { $gte: min, $lt: min + 1 },
+      });
 
-    // ADVANCED FILTERING
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+      return this;
+    }
 
-    this.modelQuery = this.modelQuery.find(
-      JSON.parse(queryStr) as FilterQuery<T>,
-    );
+    // let queryStr = JSON.stringify(queryObj);
+
+    // // ADVANCED FILTERING
+    // queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+
+    // this.modelQuery = this.modelQuery.find(
+    // JSON.parse(queryStr) as FilterQuery<T>,
+    // );
+
+    this.modelQuery = this.modelQuery.find(queryObj as FilterQuery<T>);
 
     return this;
   }

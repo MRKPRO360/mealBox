@@ -13,6 +13,23 @@ const createMealPlan = catchAsync(async (req, res) => {
   });
 });
 
+const removeMealFromWeek = catchAsync(async (req, res) => {
+  const { weekId, mealId } = req.params;
+  console.log(weekId, mealId);
+
+  const result = await MealPlanServices.removeMealFromWeekFromDB(
+    weekId,
+    mealId,
+  );
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Successfully removed meal from week!',
+    data: result,
+  });
+});
+
 const getMealPlanForWeek = catchAsync(async (req, res) => {
   const { week } = req.query;
 
@@ -76,6 +93,24 @@ const updateMealPlan = catchAsync(async (req, res) => {
   });
 });
 
+const updateWeeklyPlan = catchAsync(async (req, res) => {
+  const { id } = req.params; // Get meal plan ID from request params
+  const { week, selectedMeals } = req.body; // Get week and selectedMeals from request body
+
+  const result = await MealPlanServices.updateWeeklyPlanInDB(
+    id,
+    week as string,
+    selectedMeals,
+  );
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Weekly plan updated successfully!',
+    data: result,
+  });
+});
+
 const deleteMealPlan = catchAsync(async (req, res) => {
   const { id } = req.params;
 
@@ -89,11 +124,27 @@ const deleteMealPlan = catchAsync(async (req, res) => {
   });
 });
 
+const deleteMealPlanForWeek = catchAsync(async (req, res) => {
+  const { week } = req.query;
+
+  const result = await MealPlanServices.deleteMealPlanForWeek(week as string);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Deleted weekly personal meals successfully!',
+    data: result,
+  });
+});
+
 export const MealPlanControllers = {
   createMealPlan,
   getAllMealPlan,
   updateMealPlan,
+  updateWeeklyPlan,
   deleteMealPlan,
+  deleteMealPlanForWeek,
+  removeMealFromWeek,
   getMealPlanForWeek,
   getMonthlyMealPlan,
   getCurrentAndLastMonthMealPlans,

@@ -1,11 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import AppError from '../../errors/AppError';
+import { IRecipe } from '../recipe/recipe.interface';
 import Recipe from '../recipe/recipe.model';
 import { IMealPlan } from './mealPlan.interface';
 import MealPlan from './mealPlan.model';
 
 const createMealPlanInDB = async (payload: IMealPlan) => {
+  // CHECK IF THERE's ANY WEEK PREVIOUSLY ASSIGNED!
+  const isWeekExist = await MealPlan.findOne({ week: payload.week });
+
+  if (isWeekExist)
+    throw new AppError(400, 'Meal plan already assigned for this week!');
+
   const mealIds = payload.selectedMeals;
 
   // Step 1: Check if all meal IDs are valid (exist in the Recipe collection)
@@ -18,12 +25,12 @@ const createMealPlanInDB = async (payload: IMealPlan) => {
 
   // Step 2: Validate the date (Only allow 7, 14, 21, 28)
   const newWeek = new Date(payload.week);
-  const allowedDates = [7, 14, 21, 28];
+  const allowedDates = [1, 8, 15, 22];
 
   if (!allowedDates.includes(newWeek.getDate())) {
     throw new AppError(
       400,
-      'Meal plans can only be created for the 7th, 14th, 21st, or 28th of the month.',
+      'Meal plans can only be created for the 1th, 8th, 15st, or 22th of the month.',
     );
   }
 
@@ -38,7 +45,7 @@ const createMealPlanInDB = async (payload: IMealPlan) => {
       (newWeek.getTime() - lastWeek.getTime()) / (1000 * 60 * 60 * 24);
 
     // Validate the difference should be exactly 7 days
-    if (diffInDays !== 7) {
+    if (diffInDays < 6) {
       throw new AppError(
         400,
         'Each meal plan week should be exactly 7 days apart.',
@@ -99,6 +106,41 @@ const getCurrentAndLastMonthMealPlansFromDB = async () => {
   return mealPlans;
 };
 
+const removeMealFromWeekFromDB = async (weekId: string, mealId: string) => {
+  if (!weekId || !mealId) {
+    throw new AppError(400, 'Week ID or Meal ID is missing.');
+  }
+
+  const updatedMealPlan = await MealPlan.findOneAndUpdate(
+    { week: weekId }, // Ensure the meal plan belongs to the user
+    { $pull: { selectedMeals: mealId } }, // Remove meal from array
+    { new: true }, // Return the updated document
+  );
+
+  if (!updatedMealPlan)
+    throw new AppError(400, 'Meal plan not found or unauthorized.');
+
+  return updatedMealPlan;
+};
+
+const deleteMealPlanForWeek = async (week: string) => {
+  if (!week) throw new AppError(400, 'Week is not provided');
+
+  const personalMealPlanForWeek = await MealPlan.findOneAndUpdate(
+    { week },
+    {
+      isDeleted: true,
+    },
+    {
+      new: true,
+      runValidators: true,
+    },
+  ).lean();
+
+  if (!personalMealPlanForWeek) throw new AppError(404, 'Meal plan not found'); // ✅ Ensure a document is found
+  return personalMealPlanForWeek;
+};
+
 const updateSingleMealPlanFromDB = async (
   id: string,
   payload: Partial<IMealPlan>,
@@ -106,17 +148,57 @@ const updateSingleMealPlanFromDB = async (
   return await MealPlan.findByIdAndUpdate(id, payload);
 };
 const deleteMealPlanFromDB = async (id: string) => {
-  return await MealPlan.findByIdAndUpdate(id, {
-    isDeleted: true,
+  if (!id) throw new AppError(400, 'Week is not provided');
+
+  return await MealPlan.findByIdAndUpdate(
+    id,
+    {
+      isDeleted: true,
+    },
+    {
+      new: true,
+      runValidators: true,
+    },
+  ).lean();
+};
+
+const updateWeeklyPlanInDB = async (
+  mealPlanId: string,
+  week: string,
+  selectedMeals: IRecipe[],
+) => {
+  // Check if another meal plan already exists with the same week (excluding the current one) MEANS UPDATING OTHER WEEKLY PLAN
+
+  const existingPlan = await MealPlan.findOne({
+    week,
+    _id: mealPlanId,
   });
+
+  if (!existingPlan)
+    throw new AppError(400, 'A meal plan for this week already exists ):');
+
+  const updatedMealPlan = await MealPlan.findByIdAndUpdate(
+    mealPlanId,
+    { week, selectedMeals },
+    { new: true, runValidators: true },
+  );
+
+  if (!updatedMealPlan) {
+    throw new AppError(400, 'Meal plan not found ):');
+  }
+
+  return updatedMealPlan;
 };
 
 export const MealPlanServices = {
   createMealPlanInDB,
+  removeMealFromWeekFromDB,
   getAllMealPlansFromDB,
   getCurrentAndLastMonthMealPlansFromDB,
   updateSingleMealPlanFromDB,
+  updateWeeklyPlanInDB,
   deleteMealPlanFromDB,
+  deleteMealPlanForWeek,
   getMealPlanForWeek,
   getMonthlyMealPlanFromDB,
 };

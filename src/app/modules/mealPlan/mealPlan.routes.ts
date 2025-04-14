@@ -16,8 +16,26 @@ router
     MealPlanControllers.createMealPlan,
   );
 
-// How many recipes in a week
-router.get('/week', MealPlanControllers.getMealPlanForWeek);
+router
+  .route('/week')
+  // How many recipes in a week
+  .get(MealPlanControllers.getMealPlanForWeek)
+
+  .delete(auth(USER_ROLE.admin), MealPlanControllers.deleteMealPlanForWeek);
+
+router.patch(
+  '/:id/weekly-plan',
+  auth(USER_ROLE.admin),
+  validateRequest(MealPlanValidation.updateMealPlanValidationSchema),
+  MealPlanControllers.updateWeeklyPlan,
+);
+
+// REMOVE A MEAL FROM A WEEK
+router.delete(
+  '/:weekId/meals/:mealId',
+  auth(USER_ROLE.admin),
+  MealPlanControllers.removeMealFromWeek,
+);
 
 // All plan for a month
 router.get('/monthly-plan', MealPlanControllers.getMonthlyMealPlan);

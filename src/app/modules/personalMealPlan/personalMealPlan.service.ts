@@ -11,6 +11,12 @@ const createPersonalMealPlanInDB = async (
   payload: IPersonalMealPlan,
   user: JwtPayload,
 ) => {
+  // CHECK IF THERE's ANY WEEK PREVIOUSLY ASSIGNED!
+  const isWeekExist = await PersonalMealPlan.findOne({ week: payload.week });
+
+  if (isWeekExist)
+    throw new AppError(400, 'Meal plan already assigned for this week!');
+
   const mealIds = payload.selectedMeals;
 
   // Step 1: Check if all meal IDs are valid (exist in the Recipe collection)
@@ -23,12 +29,12 @@ const createPersonalMealPlanInDB = async (
 
   // Step 2: Validate the date (Only allow 7, 14, 21, 28)
   const newWeek = new Date(payload.week);
-  const allowedDates = [7, 14, 21, 28];
+  const allowedDates = [1, 8, 15, 22];
 
   if (!allowedDates.includes(newWeek.getDate())) {
     throw new AppError(
       400,
-      'Meal plans can only be created for the 7th, 14th, 21st, or 28th of the month.',
+      'Meal plans can only be created for the 1th, 8th, 15st, or 22th of the month.',
     );
   }
 
@@ -63,7 +69,6 @@ const getPersonalMealPlanForWeek = async (week: string, user: JwtPayload) => {
   );
 };
 
-// SHOULD BE ADDED FOR PROVIDER
 const deletePersonalMealPlanForWeek = async (
   week: string,
   user: JwtPayload,

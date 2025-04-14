@@ -29,14 +29,14 @@ router
     PersonalMealPlanControllers.getPersonalMealPlanForWeek,
   )
   // update a weekly plan's selected recipes and week
-  .patch(
-    auth(USER_ROLE.customer),
-    validateRequest(
-      PersonalMealPlanValidation.updatePersonalMealPlanValidationSchema,
-    ),
-    PersonalMealPlanControllers.updateWeeklyPlan,
-  )
-  // delete a plan for a week (SHOULD BE ADDED FOR PROVIDER)
+  // .patch(
+  //   auth(USER_ROLE.customer),
+  //   validateRequest(
+  //     PersonalMealPlanValidation.updatePersonalMealPlanValidationSchema,
+  //   ),
+  //   PersonalMealPlanControllers.updateWeeklyPlan,
+  // )
+
   .delete(
     auth(USER_ROLE.customer),
     PersonalMealPlanControllers.deletePersonalMealPlanForWeek,

@@ -53,8 +53,8 @@ const recipeSchema = new Schema<IRecipe>(
 
     inStock: { type: Boolean, default: true },
     quantity: { type: String, required: true },
-    rating: { type: String, default: '3' }, // Range: 1-5 stars.
-    ratingsCount: { type: String, default: '0' },
+    rating: { type: Number, default: 3 }, // Range: 1-5 stars.
+    ratingsCount: { type: Number, default: 0 },
     portionSizes: {
       small: {
         price: String,
@@ -86,6 +86,16 @@ recipeSchema.pre('find', function (next) {
   //     { multi: true }, // Update all matching documents
   //   )
   //   .exec();
+
+  // this.model.updateMany({}, [
+  //   {
+  //     $set: {
+  //       rating: { $toDouble: '$rating' },
+  //       ratingsCount: { $toDouble: '$ratingsCount' },
+  //       createdAt: { $toDate: '$createdAt' },
+  //     },
+  //   },
+  // ]);
 
   this.where('isDeleted', false);
   next();

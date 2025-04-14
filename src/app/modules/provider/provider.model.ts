@@ -40,6 +40,7 @@ const providerSchema = new Schema<IProvider, ProviderModel>(
     },
     email: { type: String, required: true, unique: true },
     phoneNumber: { type: String, required: true },
+    bio: { type: String, required: true },
     user: {
       type: Schema.Types.ObjectId,
       required: [true, 'User id is required'],
@@ -107,7 +108,7 @@ providerSchema.virtual('reviews', {
 });
 
 const Provider = mongoose.model<IProvider, ProviderModel>(
-  'provider',
+  'Provider',
   providerSchema,
 );
 export default Provider;

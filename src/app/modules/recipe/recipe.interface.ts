@@ -55,7 +55,7 @@ export interface IRecipe {
   };
   inStock: boolean;
   quantity: string;
-  rating: string;
-  ratingsCount: string;
+  rating: number;
+  ratingsCount: number;
   isDeleted: boolean;
 }

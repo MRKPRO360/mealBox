@@ -37,6 +37,7 @@ const createProviderValidatonSchema = z.object({
     address: ProviderAddressValidationSchema.optional(),
     email: z.string().email(),
     phoneNumber: z.string().min(11).max(15),
+    bio: z.string().min(10).max(200),
     profileImg: z.string().optional(),
     cusineSpecialties: z
       .array(
@@ -55,6 +56,7 @@ const updateProviderValidatonSchema = z.object({
     name: updateProviderNameValidationSchema.optional(),
     address: ProviderAddressValidationSchema.optional(),
     email: z.string().email().optional(),
+    bio: z.string().min(10).max(200).optional(),
     phoneNumber: z.string().min(11).max(15).optional(),
     profileImg: z.string().optional(),
     cusineSpecialties: z

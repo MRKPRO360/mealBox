@@ -23,7 +23,7 @@ const createRecipeInDB = async (file: any, payload: IRecipe) => {
 // GETTING A RECIPE
 const getSingleRecipeFromDB = async (id: string) => {
   return await Recipe.findById(id)
-    .populate('recipeMenuName')
+    .populate('providerId recipeMenuName')
     .populate({
       path: 'reviews',
       select: 'rating comment userId createdAt',

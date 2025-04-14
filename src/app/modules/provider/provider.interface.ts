@@ -9,6 +9,7 @@ export interface IProvider extends Document {
   name: IUserName;
   email: string;
   user: Types.ObjectId;
+  bio: string;
   phoneNumber: string;
   password: string;
   role: typeof USER_ROLE.provider;
