@@ -22,6 +22,12 @@ router
     CustomerControllers.updateCustomer,
   );
 
+router.get(
+  '/my-preferences',
+  auth(USER_ROLE.customer),
+  CustomerControllers.getCustomerPreferences,
+);
+
 router
   .route('/:id')
   .get(auth(USER_ROLE.admin), CustomerControllers.getSingleCustomer)

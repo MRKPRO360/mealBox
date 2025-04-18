@@ -5,7 +5,7 @@ import Customer from './customer.model';
 import AppError from '../../errors/AppError';
 import { User } from '../user/user.model';
 import { ICustomer } from './customer.interface';
-import { IUser } from '../user/user.interface';
+
 import { USER_ROLE } from '../user/user.constant';
 import createToken from '../auth/auth.utils';
 import config from '../../config';
@@ -16,6 +16,17 @@ const getAllCustomersFromDB = async () => {
 
 const getSingleCustomerFromDB = async (id: string) => {
   return await Customer.findById(id);
+};
+
+const getCustomerPreferencesFromDB = async (userId: string, role: string) => {
+  let result = null;
+  if (role === USER_ROLE.customer) {
+    result = await Customer.findOne({ user: userId }).select(
+      'dietaryPreferences',
+    );
+  }
+
+  return result;
 };
 
 const deleteCustomerFromDB = async (id: string) => {
@@ -142,6 +153,7 @@ const updateCustomerInDB = async (payload: Partial<ICustomer>, file?: any) => {
 };
 
 export const CustomerServices = {
+  getCustomerPreferencesFromDB,
   getAllCustomersFromDB,
   getSingleCustomerFromDB,
   updateCustomerInDB,

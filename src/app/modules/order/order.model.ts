@@ -33,6 +33,9 @@ const orderSchema = new Schema<IOrder>(
           enum: ['Pending', 'Completed', 'Cancelled'],
           default: 'Pending',
         },
+        spiceLevel: { type: String }, // "mild", "medium", "hot", etc
+        dietaryPreferences: [{ type: String }], // ["vegan", "gluten-free"]
+        ingredientChanges: [{ type: String }],
       },
     ],
 

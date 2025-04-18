@@ -25,6 +25,18 @@ const getSingleCustomer = catchAsync(async (req, res) => {
   });
 });
 
+const getCustomerPreferences = catchAsync(async (req, res) => {
+  const { id, role } = req.user!;
+  const result = await CustomerServices.getCustomerPreferencesFromDB(id, role);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Customer preferences retrieved succesfully!',
+    data: result,
+  });
+});
+
 const updateCustomer = catchAsync(async (req, res) => {
   const result = await CustomerServices.updateCustomerInDB(req.body, req.file);
 
@@ -49,6 +61,7 @@ const deleteCustomer = catchAsync(async (req, res) => {
 });
 
 export const CustomerControllers = {
+  getCustomerPreferences,
   getAllCustomers,
   getSingleCustomer,
   updateCustomer,

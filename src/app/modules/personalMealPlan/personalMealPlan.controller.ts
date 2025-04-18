@@ -62,7 +62,7 @@ const updateWeeklyPlan = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: 'Deleted weekly personal meals successfully!',
+    message: 'Weekly plan updated successfully!',
     data: result,
   });
 });
