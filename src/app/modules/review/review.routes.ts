@@ -28,15 +28,7 @@ router
   )
   .delete(auth(USER_ROLE.customer), ReviewControllers.deleteSingleReview);
 
-router.get(
-  '/providers',
-  auth(USER_ROLE.admin, USER_ROLE.superAdmin, USER_ROLE.provider),
-  ReviewControllers.getAllProviderReviews,
-);
-router.get(
-  '/recipes',
-  auth(USER_ROLE.admin, USER_ROLE.superAdmin, USER_ROLE.provider),
-  ReviewControllers.getAllRecipeReviews,
-);
+router.get('/providers', ReviewControllers.getAllProviderReviews);
+router.get('/recipes', ReviewControllers.getAllRecipeReviews);
 
 export default router;
