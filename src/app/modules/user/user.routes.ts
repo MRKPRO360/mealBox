@@ -12,6 +12,8 @@ import { UserValidation } from './user.validation';
 
 const router = express.Router();
 
+router.post('/social-login', UserControllers.socialLogin);
+
 router.route('/create-customer').post(
   multerUpload.single('file'),
   (req: Request, res: Response, next: NextFunction) => {

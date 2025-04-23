@@ -12,7 +12,10 @@ const createPersonalMealPlanInDB = async (
   user: JwtPayload,
 ) => {
   // CHECK IF THERE's ANY WEEK PREVIOUSLY ASSIGNED!
-  const isWeekExist = await PersonalMealPlan.findOne({ week: payload.week });
+  const isWeekExist = await PersonalMealPlan.findOne({
+    week: payload.week,
+    user: user.id,
+  });
 
   if (isWeekExist)
     throw new AppError(400, 'Meal plan already assigned for this week!');
@@ -48,6 +51,7 @@ const createPersonalMealPlanInDB = async (
 
     const diffInDays =
       (newWeek.getTime() - lastWeek.getTime()) / (1000 * 60 * 60 * 24);
+    console.log(diffInDays);
 
     // Validate the difference should be exactly 7 days
     if (diffInDays < 6) {
@@ -161,33 +165,39 @@ const getAllPersonalMealPlansFromDB = async (user: JwtPayload) => {
     'selectedMeals',
   );
 };
-
+// CURRENT PREVIOUS AND NEXT MONTH PLAN.
 const getCurrentAndLastMonthPersonalMealPlansFromDB = async (
   user: JwtPayload,
 ) => {
   const today = new Date();
-  const currentMonth = today.getMonth(); // 0-based index (March = 2)
-  const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1; // Handle January case
-  const currentYear = today.getFullYear();
-  const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear; // Handle December case
+  const currentMonth = today.getMonth(); // April = 3
+  const currentYear = today.getFullYear(); // 2025
+
+  // Previous month
+  const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+  const prevMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+
+  // Next month
+  const nextMonth = currentMonth === 11 ? 0 : currentMonth + 1;
+  const nextMonthYear = currentMonth === 11 ? currentYear + 1 : currentYear;
 
   const mealPlans = await PersonalMealPlan.find({
     user: user.id,
     $or: [
       {
         week: {
-          $gte: new Date(currentYear, currentMonth, 1),
-          $lt: new Date(currentYear, currentMonth + 1, 1),
+          $gte: new Date(prevMonthYear, prevMonth, 1),
+          $lt: new Date(prevMonthYear, prevMonth + 1, 1),
         },
       },
       {
         week: {
-          $gte: new Date(lastMonthYear, lastMonth, 1),
-          $lt: new Date(lastMonthYear, lastMonth + 1, 1),
+          $gte: new Date(nextMonthYear, nextMonth, 1),
+          $lt: new Date(nextMonthYear, nextMonth + 1, 1),
         },
       },
     ],
-  }).sort({ week: 1 }); // Sorting by week in ascending order
+  }).sort({ week: 1 });
 
   return mealPlans;
 };

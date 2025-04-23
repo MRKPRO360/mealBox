@@ -1,10 +1,10 @@
+"use strict";
 // /* eslint-disable no-async-promise-executor */
 // import PDFDocument from 'pdfkit';
 // import { IOrder } from '../modules/order/order.interface';
 // import axios from 'axios';
 // import { IUser } from '../modules/user/user.interface';
 // import { IRecipe } from '../modules/recipe/recipe.interface';
-
 // /**
 //  * Generates a PDF invoice for an order.
 //  * @param {IOrder} order - The order object to generate the invoice for.
@@ -21,20 +21,16 @@
 //         responseType: 'arraybuffer',
 //       });
 //       const logoBuffer = Buffer.from(response.data);
-
 //       const doc = new PDFDocument({ margin: 50 });
 //       const buffers: Buffer[] = [];
-
 //       doc.on('data', (chunk) => buffers.push(chunk));
 //       doc.on('end', () => resolve(Buffer.concat(buffers)));
 //       doc.on('error', (err: Error) => reject(err));
-
 //       // Header with graphical design and logo
 //       const logoWidth = 70; // Set the desired width for the logo
 //       const logoX = (doc.page.width - logoWidth) / 2; // Center the logo
 //       doc.image(logoBuffer, logoX, doc.y, { width: logoWidth });
 //       doc.moveDown(6); // Move down after the logo
-
 //       doc
 //         .fontSize(20)
 //         .font('Helvetica-Bold')
@@ -55,18 +51,15 @@
 //         .text('Invoice', { align: 'center' });
 //       doc.lineWidth(1).moveTo(50, doc.y).lineTo(550, doc.y).stroke(); // Horizontal line under header
 //       doc.moveDown(0.5);
-
 //       // Invoice Details
 //       doc.fontSize(11).fillColor('#000000').text(`Invoice ID: ${order._id}`);
 //       doc.text(`Order Date: ${(order.createdAt as Date).toLocaleDateString()}`);
 //       doc.moveDown(0.5);
-
 //       doc.text(
 //         `Customer Name: ${(order.user as unknown as IUser).name.firstName}`,
 //       );
 //       doc.text(`Shipping Address: ${order.shippingAddress}`);
 //       doc.moveDown(1);
-
 //       // Payment Details with graphical design
 //       doc
 //         .fontSize(11)
@@ -77,7 +70,6 @@
 //       doc.text(`Payment Method: ${order.paymentMethod}`);
 //       doc.moveDown(1);
 //       // doc.lineWidth(0.5).moveTo(50, doc.y).lineTo(550, doc.y).stroke();  // Horizontal line
-
 //       // // Order Products in a table format
 //       // doc.moveDown(2);
 //       doc
@@ -86,10 +78,8 @@
 //         .fillColor('#003366')
 //         .text('Order Products:', { underline: true });
 //       doc.moveDown(1);
-
 //       const tableTop = doc.y;
 //       const tableHeight = 20;
-
 //       // Table Headers for Products (Bold and Colored)
 //       doc
 //         .fontSize(11)
@@ -98,22 +88,18 @@
 //         .text('Product Name', 50, tableTop);
 //       doc.text('Quantity', 300, tableTop);
 //       doc.text('Price', 450, tableTop);
-
 //       doc
 //         .lineWidth(0.5)
 //         .moveTo(50, tableTop + tableHeight)
 //         .lineTo(550, tableTop + tableHeight)
 //         .stroke(); // Table header line
 //       let currentY = tableTop + tableHeight + 5;
-
 //       // Order Products (Normal text, not bold)
 //       order.meals.forEach((item) => {
 //         const productName =
 //           (item.meal as unknown as IRecipe)?.recipeName || 'Unknown Product';
 //         const quantity = item.quantity;
-
 //         const price = item.quantity * quantity || 0;
-
 //         doc
 //           .fontSize(11)
 //           .fillColor('#000000')
@@ -128,14 +114,10 @@
 //         });
 //         currentY += tableHeight;
 //       });
-
 //       // Final Table Border
 //       doc.lineWidth(0.5).moveTo(50, currentY).lineTo(550, currentY).stroke();
-
 //       doc.moveDown(2);
-
 //       const pricingTableTop = doc.y;
-
 //       // Table Headers for Pricing (Bold and Colored)
 //       doc
 //         .fontSize(11)
@@ -143,14 +125,12 @@
 //         .fillColor('#003366')
 //         .text('Description', 50, pricingTableTop);
 //       doc.text('Amount', 450, pricingTableTop);
-
 //       doc
 //         .lineWidth(0.5)
 //         .moveTo(50, pricingTableTop + tableHeight)
 //         .lineTo(550, pricingTableTop + tableHeight)
 //         .stroke(); // Pricing header line
 //       let pricingY = pricingTableTop + tableHeight + 5;
-
 //       // Pricing Breakdown (Normal text, not bold)
 //       doc
 //         .fontSize(11)
@@ -161,14 +141,11 @@
 //         align: 'right',
 //       });
 //       pricingY += tableHeight;
-
 //       doc
 //         .fontSize(11)
 //         .fillColor('#000000')
 //         .text('Discount', 50, pricingY, { width: 200 });
-
 //       pricingY += tableHeight;
-
 //       doc
 //         .fontSize(11)
 //         .fillColor('#000000')
@@ -178,7 +155,6 @@
 //         align: 'right',
 //       });
 //       pricingY += tableHeight;
-
 //       // Final Amount (Bold and Color)
 //       doc
 //         .fontSize(11)
@@ -194,10 +170,8 @@
 //           align: 'right',
 //         });
 //       pricingY += tableHeight;
-
 //       // Final Pricing Table Border
 //       doc.lineWidth(0.5).moveTo(50, pricingY).lineTo(550, pricingY).stroke();
-
 //       doc.moveDown(3);
 //       doc.fontSize(9).text('Thank you for shopping!');
 //       doc

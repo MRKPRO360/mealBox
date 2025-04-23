@@ -11,6 +11,101 @@ import config from '../../config';
 import Provider from '../provider/provider.model';
 import Admin from '../admin/admin.model';
 
+const socialLogin = async (
+  payload: Partial<IUser> & { profileImg?: string },
+) => {
+  const { email, name, method, profileImg } = payload;
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    // Check if user already exists
+    let user = await User.findOne({ email }).session(session);
+
+    if (!user) {
+      // Generate a random password for social login users
+      const randomPassword =
+        Math.random().toString(36).slice(-16) +
+        Math.random().toString(36).slice(-16);
+
+      // Create new user with generated password
+
+      const newUser = await User.create(
+        [
+          {
+            email,
+            name,
+            password: randomPassword, // Required field
+            method,
+            role: 'customer', // Default role
+            status: 'in-progress', // Assuming you want to activate social login users immediately
+            isDeleted: false,
+          },
+        ],
+        { session },
+      );
+
+      if (!newUser || !newUser.length) {
+        throw new AppError(400, 'Failed to create user');
+      }
+
+      user = newUser[0];
+
+      // Create customer profile
+      await Customer.create(
+        [
+          {
+            user: user._id,
+            name,
+            email,
+            profileImg: profileImg || '',
+            method,
+          },
+        ],
+        { session },
+      );
+    }
+
+    // Prepare JWT payload
+    const customer = await Customer.findOne({ user: user._id }).session(
+      session,
+    );
+
+    const jwtPayload = {
+      email: user.email,
+      role: user.role,
+      id: user._id,
+      profileImg: customer?.profileImg || '',
+    };
+
+    const accessToken = createToken(
+      jwtPayload,
+      config.jwt_access_secret as string,
+      config.jwt_access_expires_in as string,
+    );
+
+    const refreshToken = createToken(
+      jwtPayload,
+      config.jwt_refresh_secret as string,
+      config.jwt_refresh_expires_in as string,
+    );
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return {
+      accessToken,
+      refreshToken,
+      user: jwtPayload,
+    };
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
+};
+
 const createCustomerInDB = async (
   file: any,
   password: string,
@@ -246,6 +341,7 @@ const changeStatus = async (id: string, payload: { status: string }) => {
 };
 
 export const UserServices = {
+  socialLogin,
   createCustomerInDB,
   createAdminInDB,
   createProviderInDB,

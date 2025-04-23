@@ -2,6 +2,19 @@ import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import { UserServices } from './user.service';
 
+const socialLogin = catchAsync(async (req, res) => {
+  // const { email, name, method, profileImg } = req.body;
+
+  const result = await UserServices.socialLogin(req.body);
+
+  sendResponse(res, {
+    statusCode: 201,
+    success: true,
+    message: 'Customer created successfully',
+    data: result,
+  });
+});
+
 const createCustomer = catchAsync(async (req, res) => {
   const { password, ...customerData } = req.body;
 
@@ -82,4 +95,5 @@ export const UserControllers = {
   createAdmin,
   getMe,
   changeStatus,
+  socialLogin,
 };
