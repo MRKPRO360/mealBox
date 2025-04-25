@@ -6,45 +6,98 @@ import Recipe from '../recipe/recipe.model';
 import { IMealPlan } from './mealPlan.interface';
 import MealPlan from './mealPlan.model';
 
+// const createMealPlanInDB = async (payload: IMealPlan) => {
+//   // CHECK IF THERE's ANY WEEK PREVIOUSLY ASSIGNED!
+//   const isWeekExist = await MealPlan.findOne({ week: payload.week });
+
+//   if (isWeekExist)
+//     throw new AppError(400, 'Meal plan already assigned for this week!');
+
+//   const mealIds = payload.selectedMeals;
+
+//   // Step 1: Check if all meal IDs are valid (exist in the Recipe collection)
+//   const validMeals = await Recipe.find({ _id: { $in: mealIds } });
+
+//   // If the number of valid meals doesn't match the number of provided meals, there's an invalid ID
+//   if (validMeals.length !== mealIds.length) {
+//     throw new AppError(400, 'One or more meal IDs are invalid');
+//   }
+
+//   // Step 2: Validate the date (Only allow 7, 14, 21, 28)
+//   const newWeek = new Date(payload.week);
+//   const allowedDates = [1, 8, 15, 22];
+
+//   if (!allowedDates.includes(newWeek.getDate())) {
+//     throw new AppError(
+//       400,
+//       'Meal plans can only be created for the 1th, 8th, 15st, or 22th of the month.',
+//     );
+//   }
+
+//   // Find the most recent meal plan
+//   const latestMealPlan = await MealPlan.findOne().sort({ week: -1 });
+
+//   if (latestMealPlan) {
+//     // Calculate the difference in days
+//     const lastWeek = new Date(latestMealPlan.week);
+//     const newWeek = new Date(payload.week);
+//     const diffInDays =
+//       (newWeek.getTime() - lastWeek.getTime()) / (1000 * 60 * 60 * 24);
+
+//     // Validate the difference should be exactly 7 days
+//     if (Math.abs(diffInDays) < 6) {
+//       throw new AppError(
+//         400,
+//         'Each meal plan week should be exactly 7 days apart.',
+//       );
+//     }
+//   }
+
+//   return await MealPlan.create(payload);
+// };
+
 const createMealPlanInDB = async (payload: IMealPlan) => {
-  // CHECK IF THERE's ANY WEEK PREVIOUSLY ASSIGNED!
-  const isWeekExist = await MealPlan.findOne({ week: payload.week });
+  // Convert incoming week to Bangladesh time (UTC+6)
+  const incomingWeekUTC = new Date(payload.week);
+  const BD_TIME_OFFSET_MS = 6 * 60 * 60 * 1000; // 6 hours in milliseconds
+  const bdWeekDate = new Date(incomingWeekUTC.getTime() + BD_TIME_OFFSET_MS);
 
-  if (isWeekExist)
+  // Step 1: Check if a meal plan already exists for this week
+  const isWeekExist = await MealPlan.findOne({ week: bdWeekDate });
+
+  if (isWeekExist) {
     throw new AppError(400, 'Meal plan already assigned for this week!');
+  }
 
+  // Step 2: Validate meal IDs
   const mealIds = payload.selectedMeals;
-
-  // Step 1: Check if all meal IDs are valid (exist in the Recipe collection)
   const validMeals = await Recipe.find({ _id: { $in: mealIds } });
 
-  // If the number of valid meals doesn't match the number of provided meals, there's an invalid ID
   if (validMeals.length !== mealIds.length) {
     throw new AppError(400, 'One or more meal IDs are invalid');
   }
 
-  // Step 2: Validate the date (Only allow 7, 14, 21, 28)
-  const newWeek = new Date(payload.week);
+  // Step 3: Validate allowed start dates
   const allowedDates = [1, 8, 15, 22];
 
-  if (!allowedDates.includes(newWeek.getDate())) {
+  if (!allowedDates.includes(bdWeekDate.getDate())) {
     throw new AppError(
       400,
-      'Meal plans can only be created for the 1th, 8th, 15st, or 22th of the month.',
+      'Meal plans can only be created for the 1st, 8th, 15th, or 22nd of the month.',
     );
   }
 
-  // Find the most recent meal plan
+  // Step 4: Check that this week is exactly 7 days apart from the latest meal plan
   const latestMealPlan = await MealPlan.findOne().sort({ week: -1 });
 
   if (latestMealPlan) {
-    // Calculate the difference in days
-    const lastWeek = new Date(latestMealPlan.week);
-    const newWeek = new Date(payload.week);
-    const diffInDays =
-      (newWeek.getTime() - lastWeek.getTime()) / (1000 * 60 * 60 * 24);
+    const lastWeekUTC = new Date(latestMealPlan.week);
+    const lastWeekBD = new Date(lastWeekUTC.getTime() + BD_TIME_OFFSET_MS);
 
-    // Validate the difference should be exactly 7 days
+    const diffInDays = Math.abs(
+      (bdWeekDate.getTime() - lastWeekBD.getTime()) / (1000 * 60 * 60 * 24),
+    );
+
     if (diffInDays < 6) {
       throw new AppError(
         400,
@@ -53,7 +106,11 @@ const createMealPlanInDB = async (payload: IMealPlan) => {
     }
   }
 
-  return await MealPlan.create(payload);
+  // Step 5: Create the new meal plan with the BD date
+  return await MealPlan.create({
+    ...payload,
+    week: bdWeekDate,
+  });
 };
 
 const getMealPlanForWeek = async (week: string) => {
@@ -80,14 +137,51 @@ const getAllMealPlansFromDB = async () => {
 };
 
 const getCurrentAndLastMonthMealPlansFromDB = async () => {
+  // const today = new Date();
+  // const currentMonth = today.getMonth(); // 0-based index (March = 2)
+  // const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1; // Handle January case
+  // const currentYear = today.getFullYear();
+  // const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear; // Handle December case
+
+  // const mealPlans = await MealPlan.find({
+  //   $or: [
+  //     {
+  //       week: {
+  //         $gte: new Date(currentYear, currentMonth, 1),
+  //         $lt: new Date(currentYear, currentMonth + 1, 1),
+  //       },
+  //     },
+  //     {
+  //       week: {
+  //         $gte: new Date(lastMonthYear, lastMonth, 1),
+  //         $lt: new Date(lastMonthYear, lastMonth + 1, 1),
+  //       },
+  //     },
+  //   ],
+  // }).sort({ week: 1 }); // Sorting by week in ascending order
+
+  // return mealPlans;
+
   const today = new Date();
-  const currentMonth = today.getMonth(); // 0-based index (March = 2)
-  const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1; // Handle January case
+  const currentMonth = today.getMonth();
   const currentYear = today.getFullYear();
-  const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear; // Handle December case
+
+  // Last month
+  const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+  const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+
+  // Next month
+  const nextMonth = currentMonth === 11 ? 0 : currentMonth + 1;
+  const nextMonthYear = currentMonth === 11 ? currentYear + 1 : currentYear;
 
   const mealPlans = await MealPlan.find({
     $or: [
+      {
+        week: {
+          $gte: new Date(lastMonthYear, lastMonth, 1),
+          $lt: new Date(lastMonthYear, lastMonth + 1, 1),
+        },
+      },
       {
         week: {
           $gte: new Date(currentYear, currentMonth, 1),
@@ -96,12 +190,12 @@ const getCurrentAndLastMonthMealPlansFromDB = async () => {
       },
       {
         week: {
-          $gte: new Date(lastMonthYear, lastMonth, 1),
-          $lt: new Date(lastMonthYear, lastMonth + 1, 1),
+          $gte: new Date(nextMonthYear, nextMonth, 1),
+          $lt: new Date(nextMonthYear, nextMonth + 1, 1),
         },
       },
     ],
-  }).sort({ week: 1 }); // Sorting by week in ascending order
+  }).sort({ week: 1 });
 
   return mealPlans;
 };

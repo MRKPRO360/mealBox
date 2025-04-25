@@ -18,11 +18,12 @@ const personalMealPlanSchema = new Schema<IPersonalMealPlan>(
 
 // FILTERING OUT THE DELETED SCHEMA
 personalMealPlanSchema.pre('find', function (next) {
-  this.where('isDeleted', false);
+  this.where({ isDeleted: false });
   next();
 });
+
 personalMealPlanSchema.pre('findOne', function (next) {
-  this.where('isDeleted', false);
+  this.where({ isDeleted: false });
   next();
 });
 

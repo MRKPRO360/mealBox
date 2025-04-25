@@ -11,49 +11,52 @@ const createPersonalMealPlanInDB = async (
   payload: IPersonalMealPlan,
   user: JwtPayload,
 ) => {
-  // CHECK IF THERE's ANY WEEK PREVIOUSLY ASSIGNED!
+  // Convert incoming week to Bangladesh time (UTC+6)
+  const incomingWeekUTC = new Date(payload.week);
+  const BD_TIME_OFFSET_MS = 6 * 60 * 60 * 1000; // 6 hours in milliseconds
+  const bdWeekDate = new Date(incomingWeekUTC.getTime() + BD_TIME_OFFSET_MS);
+
+  // Step 1: Check if this week already has a meal plan for the user
   const isWeekExist = await PersonalMealPlan.findOne({
-    week: payload.week,
+    week: bdWeekDate,
     user: user.id,
   });
 
-  if (isWeekExist)
+  if (isWeekExist) {
     throw new AppError(400, 'Meal plan already assigned for this week!');
+  }
 
+  // Step 2: Validate meal IDs
   const mealIds = payload.selectedMeals;
-
-  // Step 1: Check if all meal IDs are valid (exist in the Recipe collection)
   const validMeals = await Recipe.find({ _id: { $in: mealIds } });
 
-  // If the number of valid meals doesn't match the number of provided meals, there's an invalid ID
   if (validMeals.length !== mealIds.length) {
     throw new AppError(400, 'One or more meal IDs are invalid');
   }
 
-  // Step 2: Validate the date (Only allow 7, 14, 21, 28)
-  const newWeek = new Date(payload.week);
+  // Step 3: Validate allowed start dates (1st, 8th, 15th, 22nd)
   const allowedDates = [1, 8, 15, 22];
 
-  if (!allowedDates.includes(newWeek.getDate())) {
+  if (!allowedDates.includes(bdWeekDate.getDate())) {
     throw new AppError(
       400,
-      'Meal plans can only be created for the 1th, 8th, 15st, or 22th of the month.',
+      'Meal plans can only be created for the 1st, 8th, 15th, or 22nd of the month.',
     );
   }
 
-  // Find the most recent meal plan
-  const latestMealPlan = await PersonalMealPlan.findOne().sort({ week: -1 });
+  // Step 4: Check that this week is exactly 7 days apart from the latest meal plan
+  const latestMealPlan = await PersonalMealPlan.findOne({ user: user.id }).sort(
+    { week: -1 },
+  );
 
   if (latestMealPlan) {
-    // Calculate the difference in days
-    const lastWeek = new Date(latestMealPlan.week);
-    const newWeek = new Date(payload.week);
+    const lastWeekUTC = new Date(latestMealPlan.week);
+    const lastWeekBD = new Date(lastWeekUTC.getTime() + BD_TIME_OFFSET_MS);
 
-    const diffInDays =
-      (newWeek.getTime() - lastWeek.getTime()) / (1000 * 60 * 60 * 24);
-    console.log(diffInDays);
+    const diffInDays = Math.abs(
+      (bdWeekDate.getTime() - lastWeekBD.getTime()) / (1000 * 60 * 60 * 24),
+    );
 
-    // Validate the difference should be exactly 7 days
     if (diffInDays < 6) {
       throw new AppError(
         400,
@@ -62,15 +65,23 @@ const createPersonalMealPlanInDB = async (
     }
   }
 
-  return await PersonalMealPlan.create({ ...payload, user: user.id });
+  // Step 5: Create the new meal plan with the BD date as week
+  return await PersonalMealPlan.create({
+    ...payload,
+    week: bdWeekDate,
+    user: user.id,
+  });
 };
 
 const getPersonalMealPlanForWeek = async (week: string, user: JwtPayload) => {
   if (!week) throw new AppError(400, 'Week is not provided');
+  console.log(week);
 
-  return await PersonalMealPlan.findOne({ week, user: user.id }).populate(
-    'selectedMeals',
-  );
+  return await PersonalMealPlan.findOne({
+    week,
+    user: user.id,
+    isDeleted: false,
+  }).populate('selectedMeals');
 };
 
 const deletePersonalMealPlanForWeek = async (
@@ -91,6 +102,9 @@ const deletePersonalMealPlanForWeek = async (
   ).lean();
 
   if (!personalMealPlanForWeek) throw new AppError(404, 'Meal plan not found'); // ✅ Ensure a document is found
+
+  console.log(personalMealPlanForWeek);
+
   return personalMealPlanForWeek;
 };
 
@@ -161,9 +175,12 @@ const getMonthlyPersonalMealPlanFromDB = async (user: JwtPayload) => {
 };
 
 const getAllPersonalMealPlansFromDB = async (user: JwtPayload) => {
-  return await PersonalMealPlan.find({ user: user.id }).populate(
-    'selectedMeals',
-  );
+  return await PersonalMealPlan.find({
+    user: user.id,
+  }).populate({
+    path: 'selectedMeals',
+    match: { isDeleted: false },
+  });
 };
 // CURRENT PREVIOUS AND NEXT MONTH PLAN.
 const getCurrentAndLastMonthPersonalMealPlansFromDB = async (
@@ -188,6 +205,12 @@ const getCurrentAndLastMonthPersonalMealPlansFromDB = async (
         week: {
           $gte: new Date(prevMonthYear, prevMonth, 1),
           $lt: new Date(prevMonthYear, prevMonth + 1, 1),
+        },
+      },
+      {
+        week: {
+          $gte: new Date(currentYear, currentMonth, 1),
+          $lt: new Date(currentYear, currentMonth + 1, 1),
         },
       },
       {

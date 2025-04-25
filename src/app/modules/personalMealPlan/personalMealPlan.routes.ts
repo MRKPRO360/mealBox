@@ -36,7 +36,7 @@ router
   //   ),
   //   PersonalMealPlanControllers.updateWeeklyPlan,
   // )
-
+  // THIS IS THE ROUTE TO DELETE ENTIRE WEEK FROM PERSONAL MEAL PLAN
   .delete(
     auth(USER_ROLE.customer),
     PersonalMealPlanControllers.deletePersonalMealPlanForWeek,

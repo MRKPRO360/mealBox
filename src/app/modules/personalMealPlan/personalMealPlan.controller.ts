@@ -125,6 +125,7 @@ const updatePersonalMealPlan = catchAsync(async (req, res) => {
 
 const deletePersonalMealPlan = catchAsync(async (req, res) => {
   const { id } = req.params;
+  console.log(id);
 
   const result =
     await PersonalMealPlanServices.deletePersonalMealPlanFromDB(id);

@@ -8,7 +8,7 @@ const app: Application = express();
 
 app.use(
   cors({
-    origin: 'http://localhost:3000',
+    origin: ['https://meal-app-beta-eight.vercel.app', 'http://localhost:3000'],
     credentials: true,
   }),
 );
